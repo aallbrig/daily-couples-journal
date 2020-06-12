@@ -26,7 +26,7 @@
 
     <div class="container">
       <div class="py-5 text-center">
-        <h2>Tell us more about you!</h2>
+        <h2>Tell us more about you two!</h2>
       </div>
       <form class="needs-validation" novalidate="">
         <div class="row">
@@ -38,7 +38,7 @@
 	    <label for="primary_email">Email</label>
 	    <input id="primary_email" class="form-control" type="text">
 	  </div>
-	  <div class="col-md-5 .offset-md-1">
+	  <div class="col-md-5 offset-md-1">
 	    <label for="secondary_firstname">First Name</label>
 	    <input id="secondary_firstname" class="form-control" type="text">
 	    <label for="secondary_lastname">Last Name</label>
