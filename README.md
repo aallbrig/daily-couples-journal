@@ -9,3 +9,8 @@ docker-compose -f stack.yaml down
 ```bash
 ssh dh_hkr2aa@aquestionadaykeepsthedivorceaway.com "cd daily-couples-journal && git pull  && cd .. && rsync -avz daily-couples-journal/public_html/ aquestionadaykeepsthedivorceaway.com/"
 ```
+
+### Generate .env.sample
+```bash
+cat .env | sed -E 's/^(.*=)(.*)/\1/g' > .env.sample
+```
