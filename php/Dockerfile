@@ -11,3 +11,13 @@ RUN apk add --no-cache $PHPIZE_DEPS \
 
 RUN docker-php-ext-install mysqli
 RUN docker-php-ext-enable xdebug
+
+RUN mkdir -p /home/www-data/.php/composer \
+    && cd /home/www-data/.php/composer \
+    && curl -sS https://getcomposer.org/installer | php \
+    && mv composer.phar composer \
+    && echo "export PATH=/home/www-data/.php/composer:$PATH" > /home/www-data/.profile
+
+COPY composer.json /var/www/html/composer.json
+
+RUN /home/www-data/.php/composer/composer install
