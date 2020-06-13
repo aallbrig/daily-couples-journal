@@ -1,14 +1,26 @@
 ---
 version: "3.2"
 services:
-  pache:
+  apache:
     build: './apache/'
     depends_on:
+      - php
       - mysql
     ports:
       - "8080:80"
     volumes:
       - ./public_html/:/var/www/html/
+    networks:
+      - frontend
+      - backend
+  php:
+    build: './php/'
+    environment:
+      XDEBUG_CONFIG: remote_host=host.docker.internal
+    volumes:
+      - ./public_html/:/var/www/html/
+    networks:
+      - backend
   mysql:
     image: mysql:5.6.40
     environment:
@@ -18,3 +30,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "3306:3306"
+    networks:
+      - backend
+networks:
+  frontend:
+  backend:
