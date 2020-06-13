@@ -1,21 +1,6 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <link rel="manifest" href="site.webmanifest">
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <!-- CSS from other bootstrap pages -->
-    <link rel="stylesheet" href="https://getbootstrap.com/docs/4.5/examples/product/product.css" crossorigin="anonymous">
-
-    <title>Daily Couples Journal</title>
-  </head>
-  <body>
 <?php
-echo "User Agent: " . $_SERVER['HTTP_USER_AGENT'];
+$title="Daily Couples Journal";
+include("views/html_top.php");
 ?>
     <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
       <div class="col-md-5 p-lg-5 mx-auto my-5">
@@ -225,10 +210,4 @@ echo "User Agent: " . $_SERVER['HTTP_USER_AGENT'];
       </footer>
     </div>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-  </body>
-</html>
+<?php include("views/html_bottom.php"); ?>
