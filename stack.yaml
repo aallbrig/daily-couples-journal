@@ -20,6 +20,7 @@ services:
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
       STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY}
       STRIPE_PRODUCT_ID: ${STRIPE_PRODUCT_ID}
+      STRIPE_PRICE_ID: ${STRIPE_PRICE_ID}
     volumes:
       - ./public_html/:/var/www/html/
     networks:

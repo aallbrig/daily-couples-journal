@@ -57,7 +57,10 @@
     </footer>
     <script>
         const orderData = {
-            items: [{ id: "<?php echo $_ENV["STRIPE_PRODUCT_ID"] ?>" }],
+            items: [{
+                id: "<?php echo $_ENV["STRIPE_PRODUCT_ID"]; ?>",
+                priceId: "<?php echo $_ENV["STRIPE_PRICE_ID"]; ?>"
+            }],
             currency: "usd"
         };
     </script>

@@ -2,11 +2,17 @@
 
 require_once 'shared.php';
 
+$expectedPrice = \Stripe\Price::retrieve($_ENV["STRIPE_PRICE_ID"]);
+
 function calculateOrderAmount($items) {
-    // Replace this constant with a calculation of the order's amount
-    // Calculate the order total on the server to prevent
-    // people from directly manipulating the amount on the client
-    return 1400;
+    global $expectedPrice;
+    $price = \Stripe\Price::retrieve($items[0]->priceId);
+    if ($expectedPrice->unit_amount != $price->unit_amount) {
+      http_response_code(500);
+      echo json_encode([ 'error' => 'Internal server error.' ]);
+      exit;
+    }
+    return $expectedPrice->unit_amount;
 }
 
 $paymentIntent = \Stripe\PaymentIntent::create([
