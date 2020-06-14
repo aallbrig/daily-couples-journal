@@ -17,6 +17,9 @@ services:
     build: './php/'
     environment:
       XDEBUG_CONFIG: remote_host=host.docker.internal
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY}
+      STRIPE_PRODUCT_ID: ${STRIPE_PRODUCT_ID}
     volumes:
       - ./public_html/:/var/www/html/
     networks:
