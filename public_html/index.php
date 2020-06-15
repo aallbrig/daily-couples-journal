@@ -1,4 +1,6 @@
 <?php
+require 'vendor/autoload.php';
+
 $title="Daily Couples Journal";
 include("views/html_top.php");
 
