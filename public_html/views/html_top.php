@@ -1,6 +1,16 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo $_ENV["GOOGLE_ANALYTICS_ID"]; ?>"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '<?php echo $_ENV["GOOGLE_ANALYTICS_ID"]; ?>');
+    </script>
+
     <link rel="manifest" href="site.webmanifest">
     <!-- Required meta tags -->
     <meta charset="utf-8">

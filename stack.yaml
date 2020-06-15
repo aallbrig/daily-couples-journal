@@ -20,6 +20,7 @@ services:
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
       STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY}
       STRIPE_PRICE_ID: ${STRIPE_PRICE_ID}
+      GOOGLE_ANALYTICS_ID: ${GOOGLE_ANALYTICS_ID}
     volumes:
       - ./public_html/:/var/www/html/
     networks:
