@@ -54,21 +54,13 @@ const setupElements = function(data) {
     };
 };
 
-/*
- * Calls stripe.confirmCardPayment which creates a pop-up modal to
- * prompt the user to enter extra authentication details without leaving your page
- */
 const pay = function(stripe, card, clientSecret) {
-    // Initiate the payment.
-    // If authentication is required, confirmCardPayment will automatically display a modal
     stripe
         .confirmCardPayment(clientSecret, { payment_method: { card: card } })
         .then(function(result) {
             if (result.error) {
-                // Show error to your customer
                 showError(result.error.message);
             } else {
-                // The payment has been processed!
                 orderComplete(clientSecret);
             }
         });
@@ -82,20 +74,22 @@ const orderComplete = function(clientSecret) {
         var paymentIntent = result.paymentIntent;
         var paymentIntentJson = JSON.stringify(paymentIntent, null, 2);
 
-        document.querySelector(".sr-payment-form").classList.add("hidden");
+        document.querySelector("#payment-form").classList.add("d-none");
         document.querySelector("pre").textContent = paymentIntentJson;
 
-        document.querySelector(".sr-result").classList.remove("hidden");
+        document.querySelector(".sr-result").classList.remove("d-none");
         setTimeout(function() {
-            document.querySelector(".sr-result").classList.add("expand");
+            document.querySelector(".sr-result").classList.add("d-block");
         }, 200);
     });
 };
 
 const showError = function(errorMsgText) {
+    document.querySelector(".form-errors").classList.remove("d-none");
     const errorMsg = document.querySelector(".sr-field-error");
     errorMsg.textContent = errorMsgText;
     setTimeout(function() {
+        document.querySelector(".form-errors").classList.add("d-none");
         errorMsg.textContent = "";
     }, 4000);
 };
