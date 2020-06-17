@@ -3,7 +3,7 @@ let stripe;
 // Disable the button until we have Stripe set up on the page
 document.querySelector("button").disabled = true;
 
-fetch("/create-payment-intent.php", {
+fetch("/api/create-payment-intent.php", {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
@@ -20,7 +20,20 @@ fetch("/create-payment-intent.php", {
         form.addEventListener("submit", function(event) {
             event.preventDefault();
             // Initiate payment when the submit button is clicked
-            pay(stripe, card, clientSecret);
+            pay(stripe, card, clientSecret).then((result) => {
+                // If successful, save the user's form data
+                const formData = new FormData(form);
+                formData.append("client_secret", clientSecret);
+                formData.append("stripe_result", JSON.stringify(result));
+
+                fetch("/api/save-product.php", {
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/json"
+                  },
+                  body: JSON.stringify(Object.fromEntries(formData))
+                })
+            });
         });
     });
 
@@ -55,15 +68,19 @@ const setupElements = function(data) {
 };
 
 const pay = function(stripe, card, clientSecret) {
-    stripe
-        .confirmCardPayment(clientSecret, { payment_method: { card: card } })
-        .then(function(result) {
-            if (result.error) {
-                showError(result.error.message);
-            } else {
-                orderComplete(clientSecret);
-            }
-        });
+    return new Promise((resolve, reject) => {
+        stripe
+            .confirmCardPayment(clientSecret, { payment_method: { card: card } })
+            .then(function(result) {
+                if (result.error) {
+                    showError(result.error.message);
+                    reject(result.error);
+                } else {
+                    orderComplete(clientSecret);
+                    resolve(result);
+                }
+            });
+    });
 };
 
 /* ------- Post-payment helpers ------- */

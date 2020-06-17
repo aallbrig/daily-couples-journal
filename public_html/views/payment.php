@@ -13,19 +13,19 @@ $priceStr = money_format('$%.2n', substr($price->unit_amount, 0, -2));
         <div class="row">
             <div class="col-md-5">
                 <label for="primary_firstname">First Name</label>
-                <input id="primary_firstname" class="form-control" type="text">
+                <input id="primary_firstname" name="primary_firstname" class="form-control" type="text">
                 <label for="primary_lastname">Last Name</label>
-                <input id="primary_lastname" class="form-control" type="text">
+                <input id="primary_lastname" name="primary_lastname" class="form-control" type="text">
                 <label for="primary_phonenumber">Phone Number</label>
-                <input id="primary_phonenumber" class="form-control" type="text">
+                <input id="primary_phonenumber" name="primary_phonenumber" class="form-control" type="text">
             </div>
             <div class="col-md-5 offset-md-1">
                 <label for="secondary_firstname">First Name</label>
-                <input id="secondary_firstname" class="form-control" type="text">
+                <input id="secondary_firstname" name="secondary_firstname" class="form-control" type="text">
                 <label for="secondary_lastname">Last Name</label>
-                <input id="secondary_lastname" class="form-control" type="text">
+                <input id="secondary_lastname" name="secondary_lastname" class="form-control" type="text">
                 <label for="secondary_phonenumber">Phone Number</label>
-                <input id="secondary_phonenumber" class="form-control" type="text">
+                <input id="secondary_phonenumber" name="secondary_phonenumber" class="form-control" type="text">
             </div>
         </div>
 
