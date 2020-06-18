@@ -1,12 +1,15 @@
 <?php
 require '../vendor/autoload.php';
 require_once '../models/database.php';
+use Twilio\Rest\Client;
 
+// TODO: This class doesn't feel right
 class Api
 {
+  private $body;
   private $conn;
   private $expectedPrice;
-  private $body;
+  private $twilioClient;
 
   public function __construct()
   {
@@ -21,6 +24,7 @@ class Api
     }
 
     \Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
+    $this->twilioClient = new Client($_ENV['TWILIO_SID'], $_ENV['TWILIO_AUTH']);
     $this->expectedPrice = \Stripe\Price::retrieve($_ENV["STRIPE_PRICE_ID"]);
     $this->conn = getDatabaseConnection($_ENV["MYSQL_HOSTNAME"], $_ENV["MYSQL_DATABASE"], $_ENV["MYSQL_USERNAME"], $_ENV["MYSQL_PASSWORD"]);
   }
@@ -62,5 +66,25 @@ class Api
       'publishableKey' => $_ENV['STRIPE_PUBLISHABLE_KEY'],
       'clientSecret' => $paymentIntent->client_secret,
     ]);
+  }
+
+  public function sendSms() {
+    $targetPhoneNumber = $this->body->targetPhoneNumber;
+    $question = $this->body->question;
+    $result = $this->twilioClient->messages->create(
+      $targetPhoneNumber,
+      array(
+        'from' => $_ENV['TWILIO_PHONE_NUMBER'],
+        'body' => $question
+      )
+    );
+   if ($result->errorCode == null) {
+     return json_encode([
+       'complete' => 'ok'
+     ]);
+   } else {
+      http_response_code(400);
+      return json_encode([ 'error' => $result->errorMessage ]);
+   }
   }
 }

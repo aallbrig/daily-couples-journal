@@ -2,4 +2,4 @@
 require_once '../controllers/Api.php';
 
 $api = new Api();
-echo $api->saveProduct();
+echo $api->sendSms();
