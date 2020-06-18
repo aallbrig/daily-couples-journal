@@ -4,9 +4,13 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitb00448219ebc093b674899ab1636544d
+class ComposerStaticInitdbdb6801b386175f274921efb20e084e
 {
     public static $prefixLengthsPsr4 = array (
+        'T' => 
+        array (
+            'Twilio\\' => 7,
+        ),
         'S' => 
         array (
             'Stripe\\' => 7,
@@ -14,6 +18,10 @@ class ComposerStaticInitb00448219ebc093b674899ab1636544d
     );
 
     public static $prefixDirsPsr4 = array (
+        'Twilio\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/twilio/sdk/src/Twilio',
+        ),
         'Stripe\\' => 
         array (
             0 => __DIR__ . '/..' . '/stripe/stripe-php/lib',
@@ -23,8 +31,8 @@ class ComposerStaticInitb00448219ebc093b674899ab1636544d
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitb00448219ebc093b674899ab1636544d::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitb00448219ebc093b674899ab1636544d::$prefixDirsPsr4;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitdbdb6801b386175f274921efb20e084e::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitdbdb6801b386175f274921efb20e084e::$prefixDirsPsr4;
 
         }, null, ClassLoader::class);
     }
