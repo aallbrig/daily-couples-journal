@@ -1,15 +1,12 @@
 <?php
-require '../vendor/autoload.php';
-require_once '../models/database.php';
-use Twilio\Rest\Client;
+require_once '../vendor/autoload.php';
+require '../classes/Texting.php';
+require '../classes/Shop.php';
+require '../classes/PersistenceStore.php';
 
-// TODO: This class doesn't feel right
-class Api
+class ApiRequest
 {
-  private $body;
-  private $conn;
-  private $expectedPrice;
-  private $twilioClient;
+  public $body;
 
   public function __construct()
   {
@@ -22,62 +19,59 @@ class Api
       echo json_encode([ 'error' => 'Invalid request.' ]);
       exit;
     }
-
-    \Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
-    $this->twilioClient = new Client($_ENV['TWILIO_SID'], $_ENV['TWILIO_AUTH']);
-    $this->expectedPrice = \Stripe\Price::retrieve($_ENV["STRIPE_PRICE_ID"]);
-    $this->conn = getDatabaseConnection($_ENV["MYSQL_HOSTNAME"], $_ENV["MYSQL_DATABASE"], $_ENV["MYSQL_USERNAME"], $_ENV["MYSQL_PASSWORD"]);
   }
+}
 
-  public function __destruct()
+class Api
+{
+  private $apiRequest;
+
+  public function __construct()
   {
-    $this->conn->close();
+    $this->apiRequest = new ApiRequest();
   }
 
   public function saveProduct() {
+    $body = $this->apiRequest->body;
+    $db = new PersistenceStore();
 
-    $primaryPersonId = insertPerson($this->conn, $this->body->primary_firstname, $this->body->primary_lastname, $this->body->primary_phonenumber);
-    $secondaryPersonId = insertPerson($this->conn, $this->body->primary_firstname, $this->body->primary_lastname, $this->body->primary_phonenumber);
-    $coupleId = insertCouple($this->conn, $primaryPersonId, $secondaryPersonId);
-    $productOrderId = insertProductOrder($this->conn, $coupleId, $this->body->stripe_result);
+    // TODO: Handle errors if insert failed
+    $primaryPersonId = $db->savePerson(
+      $body->primary_firstname,
+      $body->primary_lastname,
+      $body->primary_phonenumber
+    );
+    $secondaryPersonId = $db->savePerson(
+      $body->secondary_firstname,
+      $body->secondary_lastname,
+      $body->secondary_phonenumber
+    );
+    $coupleId = $db->saveCouple($primaryPersonId, $secondaryPersonId);
+    $productOrderId = $db->saveProductOrder($coupleId, $body->stripe_result);
 
     return json_encode([
       'productOrderId' => $productOrderId
     ]);
   }
 
-  private function calculateOrderAmount($items) {
-    $price = \Stripe\Price::retrieve($items[0]->priceId);
-    if ($this->expectedPrice->unit_amount != $price->unit_amount) {
-      http_response_code(500);
-      echo json_encode([ 'error' => 'Internal server error.' ]);
-      exit;
-    }
-    return $this->expectedPrice->unit_amount;
-  }
-
   public function createPaymentIntent() {
-    $paymentIntent = \Stripe\PaymentIntent::create([
-      'amount' => $this->calculateOrderAmount($this->body->items),
-      'currency' => $this->body->currency,
-    ]);
+    $body = $this->apiRequest->body;
+    $payment = new Shop();
 
-    return json_encode([
-      'publishableKey' => $_ENV['STRIPE_PUBLISHABLE_KEY'],
-      'clientSecret' => $paymentIntent->client_secret,
-    ]);
+    $response = $payment->createPaymentIntent($body->items, $body->currency);
+
+    return json_encode($response);
   }
 
   public function sendSms() {
-    $targetPhoneNumber = $this->body->targetPhoneNumber;
-    $question = $this->body->question;
-    $result = $this->twilioClient->messages->create(
-      $targetPhoneNumber,
-      array(
-        'from' => $_ENV['TWILIO_PHONE_NUMBER'],
-        'body' => $question
-      )
-    );
+    $body = $this->apiRequest->body;
+    $texting = new Texting();
+
+    $targetPhoneNumber = $body->targetPhoneNumber;
+    $question = $body->question;
+
+    $result = $texting->sendQuestion($targetPhoneNumber, $question);
+
    if ($result->errorCode == null) {
      return json_encode([
        'complete' => 'ok'
