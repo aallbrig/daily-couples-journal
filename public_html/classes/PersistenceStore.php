@@ -31,5 +31,17 @@ class PersistenceStore
   public function saveProductOrder($coupleId, $paymentResultJSON) {
     return insertProductOrder($this->conn, $coupleId, $paymentResultJSON);
   }
+
+  public function retrieveDailySendJobs() {
+    return retrieveDailySendJobs($this->conn);
+  }
+
+  public function startNewDailySendJob() {
+    return insertNewDailySendJob($this->conn);
+  }
+
+  public function completeDailySendJob($jobId) {
+    return updateDailySendJobToComplete($this->conn, $jobId);
+  }
 }
 

@@ -37,3 +37,32 @@ function insertProductOrder($conn, $coupleId, $stripePaymentResult) {
   }
   return $productOrderId;
 }
+
+function retrieveDailySendJobs($conn) {
+  $cronJobStatus = [];
+  if ($stmt = $conn->prepare("SELECT * FROM cron_status WHERE execution_time >= CURDATE();")) {
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $cronJobStatus = $result->fetch_all();
+  }
+  return $cronJobStatus;
+}
+
+function insertNewDailySendJob($conn) {
+  $cronStatusId = null;
+  if ($stmt = $conn->prepare("INSERT INTO cron_status (execution_time, status) VALUES (CURDATE(), 'executing');")) {
+    $stmt->execute();
+    $cronStatusId = $stmt->insert_id;
+  }
+  return $cronStatusId;
+}
+
+function updateDailySendJobToComplete($conn, $cronStatusId) {
+  $updateErrors = [];
+  if ($stmt = $conn->prepare("UPDATE cron_status SET status = 'complete' WHERE id = ?;")) {
+    $stmt->bind_param("i", $cronStatusId);
+    $stmt->execute();
+    $updateErrors = $stmt->error_list;
+  }
+  return $updateErrors;
+}

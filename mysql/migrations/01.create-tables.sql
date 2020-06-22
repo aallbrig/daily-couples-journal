@@ -24,3 +24,9 @@ CREATE TABLE daily_question (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     question VARCHAR(128)
 );
+
+CREATE TABLE cron_status (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    execution_time DATETIME,
+    status ENUM('executing', 'complete')
+)
