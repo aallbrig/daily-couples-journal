@@ -25,8 +25,18 @@ CREATE TABLE daily_question (
     question VARCHAR(128)
 );
 
-CREATE TABLE cron_status (
+CREATE TABLE daily_send_cron_status (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     execution_time DATETIME,
     status ENUM('executing', 'complete')
-)
+);
+
+CREATE TABLE send_receipt (
+    couple_id INT,
+    question_id INT,
+    send_time DATETIME,
+    twilio_sids JSON,
+    PRIMARY KEY (couple_id, question_id),
+    FOREIGN KEY (couple_id) REFERENCES couple(id),
+    FOREIGN KEY (question_id) REFERENCES daily_question(id)
+);
