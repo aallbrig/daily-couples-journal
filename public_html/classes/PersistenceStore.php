@@ -43,5 +43,21 @@ class PersistenceStore
   public function completeDailySendJob($jobId) {
     return updateDailySendJobToComplete($this->conn, $jobId);
   }
+
+  public function retrieveDailyQuestions() {
+    return retrieveDailyQuestions($this->conn);
+  }
+
+  public function retrieveLastQuestionSends($limit = 100) {
+    return retrieveLastQuestionSends($this->conn, $limit);
+  }
+
+  public function insertSendReceipt($coupleId, $questionId, $twilioSids) {
+    return insertSendReceipt($this->conn, $coupleId, $questionId, $twilioSids);
+  }
+
+  public function retrievePersonsByCoupleId($coupleId) {
+    return retrievePersonsByCoupleId($this->conn, $coupleId);
+  }
 }
 

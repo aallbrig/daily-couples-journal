@@ -1,8 +1,9 @@
 <?php
 require '../classes/PersistenceStore.php';
+require '../classes/Texting.php';
 $db = new PersistenceStore();
 
-function sendResponseToRequestor($output) {
+function sendResponseToRequest($output) {
   ignore_user_abort(true);
   ob_start();
 
@@ -16,23 +17,65 @@ function sendResponseToRequestor($output) {
   flush();
 }
 
+function acceptableTime() {
+  // HACK: Assume Indy time is okay for "acceptable time" condition
+  date_default_timezone_set('America/Indiana/Indianapolis');
+  $acceptableTimeStart = DateTime::createFromFormat('H:i a', '8:00 am');
+  $acceptableTimeEnd = DateTime::createFromFormat('H:i a', '6:00 pm');
+  $currentTime = DateTime::createFromFormat('H:i a', date('H:i a'));
+  return $currentTime > $acceptableTimeStart && $currentTime < $acceptableTimeEnd;
+}
+
 function sendSms() {
+  // make sure these texts are not being sent at unreasonable hours
+  if (!acceptableTime()) {
+    echo json_encode([
+      'status' => 'not started',
+      'reason' => 'unacceptable texting time'
+    ]);
+    exit;
+  }
+
   global $db;
+  $texting = new Texting();
   // This script may take a while...
   set_time_limit(0);
 
   $jobId = $db->startNewDailySendJob();
   // We want to send a response to the requester without making them wait for the script
   // to finish
-  sendResponseToRequestor(
+  sendResponseToRequest(
     json_encode([
       'status' => 'started',
       'jobId' => $jobId
     ])
   );
 
-  // TODO: For each couple has not received a daily question SMS, send a text
-  sleep(10);
+  $questions = $db->retrieveDailyQuestions();
+  $batchSize = $_ENV['DAILY_SEND_BATCH_SIZE'];
+  $lastSentBatch = $db->retrieveLastQuestionSends($batchSize);
+  while (count($lastSentBatch) > 0) {
+    foreach ($lastSentBatch as $lastSend) {
+      // get the next question we need to send
+      $nextQuestion = null;
+      if ($lastSend['previous_question_id'] == null) {
+        $nextQuestion = $questions[0];
+      } else {
+        $nextQuestion = $questions[$lastSend['previous_question_id']++];
+      }
+      // get the people by couple id so we know what number to send to
+      $persons = $db->retrievePersonsByCoupleId($lastSend['couple_id']);
+      $twilioSids = [];
+      foreach ($persons as $person) {
+        // send the text message!
+        $twilioResult = $texting->sendQuestion($person['phone_number'], $nextQuestion['question']);
+        $twilioSids[] = $twilioResult->sid;
+      }
+      // add new record to the send receipt table to keep track of the last send
+      $db->insertSendReceipt($lastSend['couple_id'], $nextQuestion['id'], json_encode($twilioSids));
+    }
+    $lastSentBatch = $db->retrieveLastQuestionSends($batchSize);
+  }
 
   $db->completeDailySendJob($jobId);
   exit();
