@@ -35,6 +35,7 @@ class Api
     $body = $this->apiRequest->body;
     $db = new PersistenceStore();
 
+    // TODO: Validation!
     // TODO: Handle errors if insert failed
     $primaryPersonId = $db->savePerson(
       $body->primary_firstname,
@@ -61,24 +62,5 @@ class Api
     $response = $payment->createPaymentIntent($body->items, $body->currency);
 
     return json_encode($response);
-  }
-
-  public function sendSms() {
-    $body = $this->apiRequest->body;
-    $texting = new Texting();
-
-    $targetPhoneNumber = $body->targetPhoneNumber;
-    $question = $body->question;
-
-    $result = $texting->sendQuestion($targetPhoneNumber, $question);
-
-   if ($result->errorCode == null) {
-     return json_encode([
-       'complete' => 'ok'
-     ]);
-   } else {
-      http_response_code(400);
-      return json_encode([ 'error' => $result->errorMessage ]);
-   }
   }
 }
