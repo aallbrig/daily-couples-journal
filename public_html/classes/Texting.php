@@ -13,11 +13,12 @@ class Texting
 
   public function sendQuestion($phoneNumber, $question)
   {
+    $textMsg = 'Ask your partner this question: ' . $question;
     return $this->twilioClient->messages->create(
       $phoneNumber,
       array(
         'from' => $_ENV['TWILIO_PHONE_NUMBER'],
-        'body' => $question
+        'body' => $textMsg
       )
     );
   }
