@@ -1,7 +1,18 @@
 let stripe;
+let paymentIntentId;
 
 // Disable the button until we have Stripe set up on the page
 document.querySelector("button").disabled = true;
+document.querySelector("#email").addEventListener('change', (e) => {
+    if (e.target.checkValidity()) {
+        e.target.classList.remove('is-invalid');
+        e.target.classList.add('is-valid');
+       const emailValue = e.target.value;
+       updatePaymentIntent(paymentIntentId, emailValue);
+    } else {
+        e.target.classList.add('is-invalid');
+    }
+});
 
 fetch("/api/create-payment-intent.php", {
     method: "POST",
@@ -11,7 +22,10 @@ fetch("/api/create-payment-intent.php", {
     body: JSON.stringify(orderData)
 })
     .then((result) => result.json())
-    .then((json) => setupElements(json))
+    .then((json) => {
+        paymentIntentId = json.paymentIntentId
+        return setupElements(json)
+    })
     .then(function({ stripe, card, clientSecret }) {
         document.querySelector("button").disabled = false;
 
@@ -81,6 +95,21 @@ const pay = function(stripe, card, clientSecret) {
                 }
             });
     });
+};
+
+const updatePaymentIntent = (paymentIntentId, email) => {
+   return fetch("/api/update-payment-intent.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            paymentIntentId: paymentIntentId,
+            payload: {
+                receipt_email: email
+            }
+        })
+    })
 };
 
 /* ------- Post-payment helpers ------- */

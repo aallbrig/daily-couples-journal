@@ -63,4 +63,15 @@ class Api
 
     return json_encode($response);
   }
+
+  public function updatePaymentIntent() {
+    $body = $this->apiRequest->body;
+    $payment = new Shop();
+
+    // TODO: Validate!
+    $validUpdatePayload = ['receipt_email' => $body->payload->receipt_email];
+    $response = $payment->updatePaymentIntent($body->paymentIntentId, $validUpdatePayload);
+
+    return json_encode($response);
+  }
 }
