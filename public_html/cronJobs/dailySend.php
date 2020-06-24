@@ -61,7 +61,7 @@ function sendSms() {
       if ($lastSend['previous_question_id'] == null) {
         $nextQuestion = $questions[0];
       } else {
-        $nextQuestion = $questions[$lastSend['previous_question_id']++];
+        $nextQuestion = $questions[$lastSend['previous_question_id'] + 1];
       }
       // get the people by couple id so we know what number to send to
       $persons = $db->retrievePersonsByCoupleId($lastSend['couple_id']);
