@@ -10,9 +10,9 @@ class PersistenceStore
   {
     $this->conn = getDatabaseConnection(
       $_ENV["MYSQL_HOSTNAME"],
-      $_ENV["MYSQL_DATABASE"],
       $_ENV["MYSQL_USERNAME"],
-      $_ENV["MYSQL_PASSWORD"]
+      $_ENV["MYSQL_PASSWORD"],
+      $_ENV["MYSQL_DATABASE"]
     );
   }
 
