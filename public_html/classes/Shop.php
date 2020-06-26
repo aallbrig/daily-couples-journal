@@ -3,6 +3,8 @@ use Stripe\Stripe;
 use Stripe\Price;
 use Stripe\PaymentIntent;
 
+// TODO: What happens if program can't connect to Stripe APIs?
+// TODO: Error handling while interacting with external API
 class Shop
 {
   private $expectedPrice;

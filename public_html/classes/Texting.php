@@ -2,6 +2,8 @@
 require_once '../vendor/autoload.php';
 use Twilio\Rest\Client;
 
+// TODO: What happens if program can't connect to Twilio APIs?
+// TODO: Error handling while interacting with external API
 class Texting
 {
   private $twilioClient;

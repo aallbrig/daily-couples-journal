@@ -55,6 +55,7 @@ function sendSms() {
   $batchSize = $_ENV['DAILY_SEND_BATCH_SIZE'];
   $lastSentBatch = $db->retrieveLastQuestionSends($batchSize);
   while (count($lastSentBatch) > 0) {
+    // TODO: Error handling behavior
     foreach ($lastSentBatch as $lastSend) {
       // get the next question we need to send
       $nextQuestion = null;

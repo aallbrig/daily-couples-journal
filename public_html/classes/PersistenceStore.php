@@ -1,6 +1,7 @@
 <?php
 require_once '../models/database.php';
 
+// TODO: What happens if program can't connect to DB?
 class PersistenceStore
 {
   public $conn;
