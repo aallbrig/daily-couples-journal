@@ -7,7 +7,7 @@
  * /       /
  */
 
-namespace Twilio\Rest\Conversations\V1;
+namespace Twilio\Rest\Verify\V2\Service;
 
 use Twilio\Exceptions\TwilioException;
 use Twilio\ListResource;
@@ -18,52 +18,53 @@ use Twilio\Values;
 use Twilio\Version;
 
 /**
- * PLEASE NOTE that this class contains beta products that are subject to change. Use them with caution.
+ * PLEASE NOTE that this class contains preview products that are subject to change. Use them with caution. If you currently do not have developer preview access, please contact help@twilio.com.
  */
-class ConversationList extends ListResource {
+class WebhookList extends ListResource {
     /**
-     * Construct the ConversationList
+     * Construct the WebhookList
      *
      * @param Version $version Version that contains the resource
+     * @param string $serviceSid Service Sid.
      */
-    public function __construct(Version $version) {
+    public function __construct(Version $version, string $serviceSid) {
         parent::__construct($version);
 
         // Path Solution
-        $this->solution = [];
+        $this->solution = ['serviceSid' => $serviceSid, ];
 
-        $this->uri = '/Conversations';
+        $this->uri = '/Services/' . \rawurlencode($serviceSid) . '/Webhooks';
     }
 
     /**
-     * Create the ConversationInstance
+     * Create the WebhookInstance
      *
+     * @param string $friendlyName The string that you assigned to describe the
+     *                             webhook
+     * @param string[] $eventTypes The array of events that this Webhook is
+     *                             subscribed to.
+     * @param string $webhookUrl The URL associated with this Webhook.
      * @param array|Options $options Optional Arguments
-     * @return ConversationInstance Created ConversationInstance
+     * @return WebhookInstance Created WebhookInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function create(array $options = []): ConversationInstance {
+    public function create(string $friendlyName, array $eventTypes, string $webhookUrl, array $options = []): WebhookInstance {
         $options = new Values($options);
 
         $data = Values::of([
-            'FriendlyName' => $options['friendlyName'],
-            'DateCreated' => Serialize::iso8601DateTime($options['dateCreated']),
-            'DateUpdated' => Serialize::iso8601DateTime($options['dateUpdated']),
-            'MessagingServiceSid' => $options['messagingServiceSid'],
-            'Attributes' => $options['attributes'],
-            'State' => $options['state'],
-            'Timers.Inactive' => $options['timersInactive'],
-            'Timers.Closed' => $options['timersClosed'],
+            'FriendlyName' => $friendlyName,
+            'EventTypes' => Serialize::map($eventTypes, function($e) { return $e; }),
+            'WebhookUrl' => $webhookUrl,
+            'Status' => $options['status'],
         ]);
-        $headers = Values::of(['X-Twilio-Webhook-Enabled' => $options['xTwilioWebhookEnabled'], ]);
 
-        $payload = $this->version->create('POST', $this->uri, [], $data, $headers);
+        $payload = $this->version->create('POST', $this->uri, [], $data);
 
-        return new ConversationInstance($this->version, $payload);
+        return new WebhookInstance($this->version, $payload, $this->solution['serviceSid']);
     }
 
     /**
-     * Streams ConversationInstance records from the API as a generator stream.
+     * Streams WebhookInstance records from the API as a generator stream.
      * This operation lazily loads records as efficiently as possible until the
      * limit
      * is reached.
@@ -89,7 +90,7 @@ class ConversationList extends ListResource {
     }
 
     /**
-     * Reads ConversationInstance records from the API as a list.
+     * Reads WebhookInstance records from the API as a list.
      * Unlike stream(), this operation is eager and will load `limit` records into
      * memory before returning.
      *
@@ -101,53 +102,52 @@ class ConversationList extends ListResource {
      *                        page_size is defined but a limit is defined, read()
      *                        will attempt to read the limit with the most
      *                        efficient page size, i.e. min(limit, 1000)
-     * @return ConversationInstance[] Array of results
+     * @return WebhookInstance[] Array of results
      */
     public function read(int $limit = null, $pageSize = null): array {
         return \iterator_to_array($this->stream($limit, $pageSize), false);
     }
 
     /**
-     * Retrieve a single page of ConversationInstance records from the API.
+     * Retrieve a single page of WebhookInstance records from the API.
      * Request is executed immediately
      *
      * @param mixed $pageSize Number of records to return, defaults to 50
      * @param string $pageToken PageToken provided by the API
      * @param mixed $pageNumber Page Number, this value is simply for client state
-     * @return ConversationPage Page of ConversationInstance
+     * @return WebhookPage Page of WebhookInstance
      */
-    public function page($pageSize = Values::NONE, string $pageToken = Values::NONE, $pageNumber = Values::NONE): ConversationPage {
+    public function page($pageSize = Values::NONE, string $pageToken = Values::NONE, $pageNumber = Values::NONE): WebhookPage {
         $params = Values::of(['PageToken' => $pageToken, 'Page' => $pageNumber, 'PageSize' => $pageSize, ]);
 
         $response = $this->version->page('GET', $this->uri, $params);
 
-        return new ConversationPage($this->version, $response, $this->solution);
+        return new WebhookPage($this->version, $response, $this->solution);
     }
 
     /**
-     * Retrieve a specific page of ConversationInstance records from the API.
+     * Retrieve a specific page of WebhookInstance records from the API.
      * Request is executed immediately
      *
      * @param string $targetUrl API-generated URL for the requested results page
-     * @return ConversationPage Page of ConversationInstance
+     * @return WebhookPage Page of WebhookInstance
      */
-    public function getPage(string $targetUrl): ConversationPage {
+    public function getPage(string $targetUrl): WebhookPage {
         $response = $this->version->getDomain()->getClient()->request(
             'GET',
             $targetUrl
         );
 
-        return new ConversationPage($this->version, $response, $this->solution);
+        return new WebhookPage($this->version, $response, $this->solution);
     }
 
     /**
-     * Constructs a ConversationContext
+     * Constructs a WebhookContext
      *
-     * @param string $sid A 34 character string that uniquely identifies this
-     *                    resource.
+     * @param string $sid The unique string that identifies the resource to fetch
      */
-    public function getContext(string $sid): ConversationContext {
-        return new ConversationContext($this->version, $sid);
+    public function getContext(string $sid): WebhookContext {
+        return new WebhookContext($this->version, $this->solution['serviceSid'], $sid);
     }
 
     /**
@@ -156,6 +156,6 @@ class ConversationList extends ListResource {
      * @return string Machine friendly representation
      */
     public function __toString(): string {
-        return '[Twilio.Conversations.V1.ConversationList]';
+        return '[Twilio.Verify.V2.WebhookList]';
     }
 }
