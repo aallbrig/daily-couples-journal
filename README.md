@@ -23,3 +23,9 @@ _This assumes `docker-compose -f stack.yaml up` or `docker-compose -f stack.yaml
 docker cp $(docker run -d --rm daily-couples-journal_php:latest):/var/www/html/vendor public_html
 ```
 
+### View all TODO or HACKs that exist in code
+```bash
+grep -R --exclude-dir=vendor --exclude=README.md 'TODO' .
+grep -R --exclude-dir=vendor --exclude=README.md 'HACK' .
+```
+
