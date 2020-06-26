@@ -29,10 +29,10 @@ function insertCouple($conn, $primaryPersonId, $secondaryPersonId) {
   return $coupleId;
 }
 
-function insertProductOrder($conn, $coupleId, $stripePaymentResult) {
+function insertProductOrder($conn, $coupleId, $startDate, $stripePaymentResult) {
   $productOrderId = null;
-  if ($stmt = $conn->prepare("INSERT INTO product_order (couple_id, stripe_result) VALUES (?, CAST(? AS JSON));")) {
-    $stmt->bind_param("ss", $coupleId, $stripePaymentResult);
+  if ($stmt = $conn->prepare("INSERT INTO product_order (couple_id, start_date, stripe_result) VALUES (?, CAST(? AS DATETIME), CAST(? AS JSON));")) {
+    $stmt->bind_param("sss", $coupleId, $startDate, $stripePaymentResult);
     $stmt->execute();
     $productOrderId = $stmt->insert_id;
     $stmt->close();
@@ -93,12 +93,15 @@ function retrieveLastQuestionSends($conn, $limit = 100) {
             GROUP BY couple_id
         ) AS lastsend ON po.couple_id = lastsend.couple_id
     WHERE
-        lastsend.previous_question_id IS NULL
-        OR
-        (
-            lastsend.send_time < CURRENT_DATE()
-            AND NOT lastsend.previous_question_id >= (SELECT MAX(id) FROM daily_question)
-        )
+      po.start_date >= CURRENT_DATE()
+      AND (
+          lastsend.previous_question_id IS NULL
+          OR
+          (
+          lastsend.send_time < CURRENT_DATE()
+          AND NOT lastsend.previous_question_id >= (SELECT MAX(id) FROM daily_question)
+          )
+      )
     LIMIT ?;
   ")) {
     $stmt->bind_param("i", $limit);

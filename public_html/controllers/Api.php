@@ -36,19 +36,30 @@ class Api
     $db = new PersistenceStore();
 
     // TODO: Validation!
+    $validPrimaryFirstName = $body->primary_firstname;
+    $validPrimaryLastName = $body->primary_lastname;
+    $validPrimaryPhoneNumber = $body->primary_phonenumber;
+
+    $validSecondaryFirstName = $body->secondary_firstname;
+    $validSecondaryLastName = $body->secondary_lastname;
+    $validSecondaryPhoneNumber = $body->secondary_phonenumber;
+
+    $validStartDate = date_format(date_create($body->start_date), 'Y-m-d H:i:s');
+    $validStripeResult = $body->stripe_result;
+
     // TODO: Handle errors if insert failed
     $primaryPersonId = $db->savePerson(
-      $body->primary_firstname,
-      $body->primary_lastname,
-      $body->primary_phonenumber
+      $validPrimaryFirstName,
+      $validPrimaryLastName,
+      $validPrimaryPhoneNumber
     );
     $secondaryPersonId = $db->savePerson(
-      $body->secondary_firstname,
-      $body->secondary_lastname,
-      $body->secondary_phonenumber
+      $validSecondaryFirstName,
+      $validSecondaryLastName,
+      $validSecondaryPhoneNumber
     );
     $coupleId = $db->saveCouple($primaryPersonId, $secondaryPersonId);
-    $productOrderId = $db->saveProductOrder($coupleId, $body->stripe_result);
+    $productOrderId = $db->saveProductOrder($coupleId, $validStartDate, $validStripeResult);
 
     return json_encode([
       'productOrderId' => $productOrderId
@@ -59,6 +70,7 @@ class Api
     $body = $this->apiRequest->body;
     $payment = new Shop();
 
+    // TODO: Validation!
     $response = $payment->createPaymentIntent($body->items, $body->currency);
 
     return json_encode($response);
@@ -68,9 +80,12 @@ class Api
     $body = $this->apiRequest->body;
     $payment = new Shop();
 
-    // TODO: Validate!
-    $validUpdatePayload = ['receipt_email' => $body->payload->receipt_email];
-    $response = $payment->updatePaymentIntent($body->paymentIntentId, $validUpdatePayload);
+    // TODO: Validation!
+    $validReceiptEmail = $body->payload->receipt_email;
+    $validPaymentIntentId = $body->paymentIntentId;
+    $validUpdatePayload = ['receipt_email' => $validReceiptEmail];
+
+    $response = $payment->updatePaymentIntent($validPaymentIntentId, $validUpdatePayload);
 
     return json_encode($response);
   }

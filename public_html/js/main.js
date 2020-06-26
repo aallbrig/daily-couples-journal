@@ -3,6 +3,7 @@ let paymentIntentId;
 
 // Disable the button until we have Stripe set up on the page
 document.querySelector("button").disabled = true;
+// TODO: Add in validation experience for all form inputs
 document.querySelector("#email").addEventListener('change', (e) => {
     if (e.target.checkValidity()) {
         e.target.classList.remove('is-invalid');

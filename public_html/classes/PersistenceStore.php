@@ -28,8 +28,8 @@ class PersistenceStore
     return insertCouple($this->conn, $primaryPersonId, $secondaryPersonId);
   }
 
-  public function saveProductOrder($coupleId, $paymentResultJSON) {
-    return insertProductOrder($this->conn, $coupleId, $paymentResultJSON);
+  public function saveProductOrder($coupleId, $startDate, $paymentResultJSON) {
+    return insertProductOrder($this->conn, $coupleId, $startDate, $paymentResultJSON);
   }
 
   public function retrieveDailySendJobs() {

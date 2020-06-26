@@ -9,7 +9,7 @@ $priceStr = money_format('$%.2n', substr($price->unit_amount, 0, -2));
 <div class="container">
     <form id="payment-form" class="needs-validation" novalidate="">
         <div class="py-5 text-center">
-            <h2>Tell us more about you two!</h2>
+            <h4>Tell us more about you two!</h4>
         </div>
         <div class="row">
             <div class="col-md-5">
@@ -27,6 +27,22 @@ $priceStr = money_format('$%.2n', substr($price->unit_amount, 0, -2));
                 <input id="secondary_lastname" name="secondary_lastname" class="form-control" type="text" required>
                 <label for="secondary_phonenumber">Phone Number</label>
                 <input id="secondary_phonenumber" name="secondary_phonenumber" class="form-control" type="text" required>
+            </div>
+        </div>
+
+        <div class="py-5 text-center">
+            <h4>When would you like to start receiving texts?</h4>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 offset-md-3 order-md-2 mb-4">
+                <div class="form-group row">
+                    <label for="date-input" class="col-2 col-form-label">Date</label>
+                    <div class="col-10">
+                        <input id="date-input" name="start_date" class="form-control" type="date" value="<?php echo date("Y-m-d", strtotime("+1 day")); ?>" min="<?php echo date("Y-m-d", strtotime("+1 day")); ?>" max="<?php echo date('Y-m-d',strtotime(date("Y-m-d", mktime()) . " + 365 day")); ?>" required>
+                        <small class="form-text text-muted">You will receive texts starting as soon as tomorrow!</small>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -57,7 +73,7 @@ $priceStr = money_format('$%.2n', substr($price->unit_amount, 0, -2));
 
                 <label for="email">Email</label>
                 <input id="email" name="email" class="form-control" type="email" required>
-                <small id="emailHelp" class="form-text text-muted">For payment receipt.</small>
+                <small class="form-text text-muted">For payment receipt.</small>
 
                 <hr class="mb-4">
                 <button class="btn btn-primary btn-lg btn-block" type="submit">Pay</button>

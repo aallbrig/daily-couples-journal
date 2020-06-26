@@ -16,6 +16,7 @@ CREATE TABLE couple (
 CREATE TABLE product_order (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     couple_id INT,
+    start_date DATETIME,
     stripe_result JSON,
     FOREIGN KEY (couple_id) REFERENCES couple(id)
 );
