@@ -10,7 +10,7 @@ document.querySelector("button").disabled = true;
 
 const inputIds = [
     'email',
-    'date-input',
+    'start_date',
     'primary_firstname',
     'primary_lastname',
     'primary_phonenumber',
@@ -29,7 +29,7 @@ inputIds.forEach((inputId) => {
         }
     })
 })
-document.querySelector("#email").addEventListener('change', (e) => {
+document.getElementById('email').addEventListener('change', (e) => {
     if (e.target.checkValidity()) {
        const emailValue = e.target.value;
        updatePaymentIntent(paymentIntentId, emailValue);
@@ -56,10 +56,11 @@ fetch("/api/create-payment-intent.php", {
 
 // Handle form submission.
 const form = document.getElementById("payment-form");
-form.addEventListener("submit", function(event) {
+form.addEventListener("submit", async (event) => {
     event.preventDefault();
     event.target.classList.add('was-validated');
     if (event.target.checkValidity()) {
+        await updatePaymentIntent(paymentIntentId, document.getElementById('email').value);
         pay(stripe, Card, ClientSecret)
             .then((result) => {
                 // If successful, save the user's form data
@@ -82,7 +83,7 @@ form.addEventListener("submit", function(event) {
 
                             inputIds.forEach((id) => {
                                 const elem = document.getElementById(id);
-                                if (elem.checkValidity()) {
+                                if (elem.checkValidity() && elem) {
                                     elem.classList.remove('is-invalid');
                                     elem.classList.add('is-valid');
                                 }
@@ -94,8 +95,10 @@ form.addEventListener("submit", function(event) {
                                 if (invalidFeedbackElem) {
                                     invalidFeedbackElem.innerHTML = json.errors[key].join("<br />")
                                 }
-                                elem.classList.remove('is-valid');
-                                elem.classList.add('is-invalid');
+                                if (elem) {
+                                    elem.classList.remove('is-valid');
+                                    elem.classList.add('is-invalid');
+                                }
                             })
                             showError(JSON.stringify(json.errors, null, 4));
                         } else {

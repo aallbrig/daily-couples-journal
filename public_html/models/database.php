@@ -145,3 +145,17 @@ function retrievePersonsByCoupleId($conn, $coupleId) {
   }
   return $persons;
 }
+
+function retrieveProductOrderByPaymentIntentId($conn, $paymentIntentId) {
+  $productOrders = [];
+  if ($stmt = $conn->prepare("
+    SELECT * FROM product_order
+    WHERE JSON_EXTRACT(stripe_result, '$.paymentIntent.id') = ?
+  ")) {
+    $stmt->bind_param("s", $paymentIntentId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $productOrders = $result->fetch_all(MYSQLI_ASSOC);
+  }
+  return $productOrders;
+}

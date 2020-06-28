@@ -48,5 +48,9 @@ class Shop
       'receipt_email' => $updateResponse->receipt_email
     ];
   }
+
+  public function retrievePaymentIntentById($paymentIntentId) {
+    return PaymentIntent::retrieve($paymentIntentId);
+  }
 }
 

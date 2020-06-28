@@ -60,5 +60,9 @@ class PersistenceStore
   public function retrievePersonsByCoupleId($coupleId) {
     return retrievePersonsByCoupleId($this->conn, $coupleId);
   }
+
+  public function retrieveProductOrderByPaymentIntentId($paymentIntentId) {
+    return retrieveProductOrderByPaymentIntentId($this->conn, $paymentIntentId);
+  }
 }
 

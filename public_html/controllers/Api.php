@@ -18,6 +18,49 @@ abstract class ApiValidator {
     }
 
     $this->v = new Validator($this->assocArray);
+
+    $this->v->addInstanceRule('stripeResultNotAlreadyStored', function ($field, $value, $params, $fields) {
+      $db = null;
+      $json = json_decode($value);
+      if (json_last_error() !== JSON_ERROR_NONE) {
+        return false;
+      }
+      $db = new PersistenceStore();
+      $dbResults = $db->retrieveProductOrderByPaymentIntentId($json->paymentIntent->id);
+      // is the stripe result payment ID already in DB?
+      if (count($dbResults) > 0) {
+        return false;
+      }
+      return true;
+    }, '{field} is invalid -- this payment is already associated with an order!');
+
+    $this->v->addInstanceRule('validStripeResult', function ($field, $value, $params, $fields) {
+      $shop = null;
+      $json = json_decode($value);
+      if (json_last_error() !== JSON_ERROR_NONE) {
+        return false;
+      }
+      $shop = new Shop();
+      $intentResult = $shop->retrievePaymentIntentById($json->paymentIntent->id);
+      // is the stripe result payment ID valid?
+      if ($intentResult->status != "succeeded") {
+        return false;
+      }
+      if ($intentResult->client_secret != $fields['client_secret']) {
+        return false;
+      }
+      if ($intentResult->receipt_email != $fields['email']) {
+        return false;
+      }
+      if ($intentResult->last_payment_error != null) {
+        return false;
+      }
+      if ($intentResult->canceled_at != null) {
+        return false;
+      }
+      return true;
+    }, '{field} is invalid - please reload and try again');
+
   }
 
   public function validate() {
@@ -34,6 +77,7 @@ class SaveProductValidator extends ApiValidator
   public function __construct($dataToValidate)
   {
     parent::__construct($dataToValidate);
+
     $phoneNumberRegex = '/^([0-9]( |-)?)?(\(?[0-9]{3}\)?|[0-9]{3})( |-)?([0-9]{3}( |-)?[0-9]{4}|[a-zA-Z0-9]{7})$/';
 
     $emailInput = 'email';
@@ -44,6 +88,7 @@ class SaveProductValidator extends ApiValidator
     $secondaryFirstNameInput = 'secondary_firstname';
     $secondaryLastNameInput = 'secondary_lastname';
     $secondaryPhoneNumberInput = 'secondary_phonenumber';
+    $stripeInput = 'stripe_result';
 
     $this->v->rules([
       'required' => [
@@ -80,7 +125,9 @@ class SaveProductValidator extends ApiValidator
       ],
       'dateBefore' => [
         [$dateInput, date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 day"))]
-      ]
+      ],
+      'validStripeResult' => [$stripeInput],
+      'stripeResultNotAlreadyStored' => [$stripeInput]
     ]);
   }
 }
