@@ -13,37 +13,49 @@ $priceStr = money_format('$%.2n', substr($price->unit_amount, 0, -2));
         </div>
         <div class="row">
             <div class="col-md-5">
-                <label for="primary_firstname">First Name</label>
-                <input id="primary_firstname" name="primary_firstname" class="form-control" type="text" required>
-                <div id="primary_firstname-feedback" class="invalid-feedback">
-                    Please input a valid first name
+                <div>
+                    <label for="primary_firstname">First Name</label>
+                    <input id="primary_firstname" name="primary_firstname" class="form-control" type="text" required>
+                    <div id="primary_firstname-feedback" class="invalid-feedback">
+                        Please input a valid first name
+                    </div>
                 </div>
-                <label for="primary_lastname">Last Name</label>
-                <input id="primary_lastname" name="primary_lastname" class="form-control" type="text" required>
-                <div id="primary_lastname-feedback" class="invalid-feedback">
-                    Please input a valid last name
+                <div>
+                    <label for="primary_lastname">Last Name</label>
+                    <input id="primary_lastname" name="primary_lastname" class="form-control" type="text" required>
+                    <div id="primary_lastname-feedback" class="invalid-feedback">
+                        Please input a valid last name
+                    </div>
                 </div>
-                <label for="primary_phonenumber">Phone Number</label>
-                <input id="primary_phonenumber" name="primary_phonenumber" class="form-control" type="text" required>
-                <div id="primary_phonenumber-feedback" class="invalid-feedback">
-                    Please input a valid phone number
+                <div>
+                    <label for="primary_phonenumber">Phone Number</label>
+                    <input id="primary_phonenumber" name="primary_phonenumber" class="form-control" type="text" required>
+                    <div id="primary_phonenumber-feedback" class="invalid-feedback">
+                        Please input a valid phone number
+                    </div>
                 </div>
             </div>
             <div class="col-md-5 offset-md-1">
-                <label for="secondary_firstname">First Name</label>
-                <input id="secondary_firstname" name="secondary_firstname" class="form-control" type="text" required>
-                <div id="secondary_firstname-feedback" class="invalid-feedback">
-                    Please input a valid first name
+                <div>
+                    <label for="secondary_firstname">First Name</label>
+                    <input id="secondary_firstname" name="secondary_firstname" class="form-control" type="text" required>
+                    <div id="secondary_firstname-feedback" class="invalid-feedback">
+                        Please input a valid first name
+                    </div>
                 </div>
-                <label for="secondary_lastname">Last Name</label>
-                <input id="secondary_lastname" name="secondary_lastname" class="form-control" type="text" required>
-                <div id="secondary_lastname-feedback" class="invalid-feedback">
-                    Please input a valid last name
+                <div>
+                    <label for="secondary_lastname">Last Name</label>
+                    <input id="secondary_lastname" name="secondary_lastname" class="form-control" type="text" required>
+                    <div id="secondary_lastname-feedback" class="invalid-feedback">
+                        Please input a valid last name
+                    </div>
                 </div>
-                <label for="secondary_phonenumber">Phone Number</label>
-                <input id="secondary_phonenumber" name="secondary_phonenumber" class="form-control" type="text" required>
-                <div id="secondary_phonenumber-feedback" class="invalid-feedback">
-                    Please input a valid phone number
+                <div>
+                    <label for="secondary_phonenumber">Phone Number</label>
+                    <input id="secondary_phonenumber" name="secondary_phonenumber" class="form-control" type="text" required>
+                    <div id="secondary_phonenumber-feedback" class="invalid-feedback">
+                        Please input a valid phone number
+                    </div>
                 </div>
             </div>
         </div>
@@ -99,13 +111,14 @@ $priceStr = money_format('$%.2n', substr($price->unit_amount, 0, -2));
                 <hr class="mb-4">
                 <button class="btn btn-primary btn-lg btn-block" type="submit">Pay</button>
 
-                <div class="form-errors d-none">
-                    <hr class="mb-4">
-                    <div class="sr-field-error alert alert-danger" role="alert"></div>
-                </div>
             </div>
         </div>
     </form>
+
+    <div class="form-errors d-none">
+        <hr class="mb-4">
+        <div class="sr-field-error alert alert-danger" role="alert" style="white-space: pre;"></div>
+    </div>
 
     <div class="sr-result d-none alert alert-success" role="alert">
         <h3 class="text-center">Payment Complete!</h3>
