@@ -1,3 +1,22 @@
+# A question a day keeps the divorce away - a texting based couples journal
+The [A Question a Day Keeps the Divorce Away](https://aquestionadaykeepsthedivorceaway.com/) is a texting based daily couples journal. The idea is to sign up a pair of people to receive daily text messages to encourage the pair to learn more about each other through the ensuing conversations.
+
+The name of the product is meant to be tounge in cheek - but sharing and learning about each other as a couple _is_ very important!
+
+## Technical Babble
+1. The product is implementing using the LAMP stack to easily deploy onto a shared hosting solution.
+    - Dreamhost for domain & shared hosting solution
+    - SSH for deploy
+    - Docker & docker-compose for acceptable local dev experience
+    - MySQL DB
+    - Vanilla PHP
+    - HTML5
+    - Bootstrap CSS
+    - Vanilla JS
+1. Payment API - Stripe API
+1. Texting API - Twilio API
+1. API testing/dev Postman
+
 ## Local Dev
 ```bash
 docker-compose -f stack.yaml up
