@@ -73,6 +73,9 @@ $priceStr = money_format('$%.2n', substr($price->unit_amount, 0, -2));
 
                 <label for="email">Email</label>
                 <input id="email" name="email" class="form-control" type="email" required>
+                <div class="invalid-feedback">
+                    Please input a valid email address
+                </div>
                 <small class="form-text text-muted">For payment receipt.</small>
 
                 <hr class="mb-4">

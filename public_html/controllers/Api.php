@@ -3,6 +3,44 @@ require_once '../vendor/autoload.php';
 require '../classes/Texting.php';
 require '../classes/Shop.php';
 require '../classes/PersistenceStore.php';
+use Valitron\Validator;
+
+abstract class ApiValidator {
+  protected $v;
+  public function __construct($dataToValidate)
+  {
+    $assocArray = null;
+    if (!is_object($dataToValidate)) {
+      $assocArray = $dataToValidate;
+    } else {
+      $assocArray = json_decode(json_encode($dataToValidate), true);
+    }
+
+    $this->v = new Validator($assocArray);
+  }
+
+  public function validate() {
+    return $this->v->validate();
+  }
+
+  public function errors() {
+    return $this->v->errors();
+  }
+}
+
+class SaveProductValidator extends ApiValidator
+{
+  public function __construct($dataToValidate)
+  {
+    parent::__construct($dataToValidate);
+
+    $emailInput = 'email';
+    $this->v->rule('required', [
+      $emailInput
+    ]);
+    $this->v->rule('email', $emailInput);
+  }
+}
 
 class ApiRequest
 {
@@ -33,9 +71,16 @@ class Api
 
   public function saveProduct() {
     $body = $this->apiRequest->body;
-    $db = new PersistenceStore();
+    $v = new SaveProductValidator($body);
 
-    // TODO: Validation!
+    // TODO: Validation
+    if (!$v->validate()) {
+      http_response_code(400);
+      echo json_encode([ 'errors' => $v->errors() ]);
+      exit;
+    }
+
+    $db = new PersistenceStore();
     $validPrimaryFirstName = $body->primary_firstname;
     $validPrimaryLastName = $body->primary_lastname;
     $validPrimaryPhoneNumber = $body->primary_phonenumber;
