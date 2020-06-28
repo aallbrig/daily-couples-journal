@@ -7,16 +7,17 @@ use Valitron\Validator;
 
 abstract class ApiValidator {
   protected $v;
+  protected $assocArray;
+
   public function __construct($dataToValidate)
   {
-    $assocArray = null;
     if (!is_object($dataToValidate)) {
-      $assocArray = $dataToValidate;
+      $this->assocArray = $dataToValidate;
     } else {
-      $assocArray = json_decode(json_encode($dataToValidate), true);
+      $this->assocArray = json_decode(json_encode($dataToValidate), true);
     }
 
-    $this->v = new Validator($assocArray);
+    $this->v = new Validator($this->assocArray);
   }
 
   public function validate() {
@@ -36,6 +37,7 @@ class SaveProductValidator extends ApiValidator
     $phoneNumberRegex = '/^([0-9]( |-)?)?(\(?[0-9]{3}\)?|[0-9]{3})( |-)?([0-9]{3}( |-)?[0-9]{4}|[a-zA-Z0-9]{7})$/';
 
     $emailInput = 'email';
+    $dateInput = 'start_date';
     $primaryFirstNameInput = 'primary_firstname';
     $primaryLastNameInput = 'primary_lastname';
     $primaryPhoneNumberInput = 'primary_phonenumber';
@@ -72,6 +74,12 @@ class SaveProductValidator extends ApiValidator
           $secondaryFirstNameInput,
           $secondaryLastNameInput
         ], 64]
+      ],
+      'dateAfter' => [
+        [$dateInput, date('Y-m-d')]
+      ],
+      'dateBefore' => [
+        [$dateInput, date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 day"))]
       ]
     ]);
   }

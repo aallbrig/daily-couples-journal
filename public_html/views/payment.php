@@ -69,7 +69,7 @@ $priceStr = money_format('$%.2n', substr($price->unit_amount, 0, -2));
                 <div class="form-group row">
                     <label for="date-input" class="col-2 col-form-label">Date</label>
                     <div class="col-10">
-                        <input id="date-input" name="start_date" class="form-control" type="date" value="<?php echo date("Y-m-d", strtotime("+1 day")); ?>" min="<?php echo date("Y-m-d", strtotime("+1 day")); ?>" max="<?php echo date('Y-m-d',strtotime(date("Y-m-d", mktime()) . " + 365 day")); ?>" required>
+                        <input id="start_date" name="start_date" class="form-control" type="date" value="<?php echo date("Y-m-d", strtotime("+1 day")); ?>" min="<?php echo date("Y-m-d", strtotime("+1 day")); ?>" max="<?php echo date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 day")); ?>" required>
                         <small class="form-text text-muted">You will receive texts starting as soon as tomorrow!</small>
                     </div>
                 </div>
