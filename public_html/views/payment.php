@@ -15,18 +15,36 @@ $priceStr = money_format('$%.2n', substr($price->unit_amount, 0, -2));
             <div class="col-md-5">
                 <label for="primary_firstname">First Name</label>
                 <input id="primary_firstname" name="primary_firstname" class="form-control" type="text" required>
+                <div id="primary_firstname-feedback" class="invalid-feedback">
+                    Please input a valid first name
+                </div>
                 <label for="primary_lastname">Last Name</label>
                 <input id="primary_lastname" name="primary_lastname" class="form-control" type="text" required>
+                <div id="primary_lastname-feedback" class="invalid-feedback">
+                    Please input a valid last name
+                </div>
                 <label for="primary_phonenumber">Phone Number</label>
                 <input id="primary_phonenumber" name="primary_phonenumber" class="form-control" type="text" required>
+                <div id="primary_phonenumber-feedback" class="invalid-feedback">
+                    Please input a valid phone number
+                </div>
             </div>
             <div class="col-md-5 offset-md-1">
                 <label for="secondary_firstname">First Name</label>
                 <input id="secondary_firstname" name="secondary_firstname" class="form-control" type="text" required>
+                <div id="secondary_firstname-feedback" class="invalid-feedback">
+                    Please input a valid first name
+                </div>
                 <label for="secondary_lastname">Last Name</label>
                 <input id="secondary_lastname" name="secondary_lastname" class="form-control" type="text" required>
+                <div id="secondary_lastname-feedback" class="invalid-feedback">
+                    Please input a valid last name
+                </div>
                 <label for="secondary_phonenumber">Phone Number</label>
                 <input id="secondary_phonenumber" name="secondary_phonenumber" class="form-control" type="text" required>
+                <div id="secondary_phonenumber-feedback" class="invalid-feedback">
+                    Please input a valid phone number
+                </div>
             </div>
         </div>
 
@@ -73,7 +91,7 @@ $priceStr = money_format('$%.2n', substr($price->unit_amount, 0, -2));
 
                 <label for="email">Email</label>
                 <input id="email" name="email" class="form-control" type="email" required>
-                <div class="invalid-feedback">
+                <div id="email-feedback" class="invalid-feedback">
                     Please input a valid email address
                 </div>
                 <small class="form-text text-muted">For payment receipt.</small>

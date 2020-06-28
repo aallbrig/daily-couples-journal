@@ -33,12 +33,47 @@ class SaveProductValidator extends ApiValidator
   public function __construct($dataToValidate)
   {
     parent::__construct($dataToValidate);
+    $phoneNumberRegex = '/^([0-9]( |-)?)?(\(?[0-9]{3}\)?|[0-9]{3})( |-)?([0-9]{3}( |-)?[0-9]{4}|[a-zA-Z0-9]{7})$/';
 
     $emailInput = 'email';
-    $this->v->rule('required', [
-      $emailInput
+    $primaryFirstNameInput = 'primary_firstname';
+    $primaryLastNameInput = 'primary_lastname';
+    $primaryPhoneNumberInput = 'primary_phonenumber';
+    $secondaryFirstNameInput = 'secondary_firstname';
+    $secondaryLastNameInput = 'secondary_lastname';
+    $secondaryPhoneNumberInput = 'secondary_phonenumber';
+
+    $this->v->rules([
+      'required' => [
+        $primaryFirstNameInput,
+        $primaryLastNameInput,
+        $primaryPhoneNumberInput,
+        $secondaryFirstNameInput,
+        $secondaryLastNameInput,
+        $secondaryPhoneNumberInput,
+        $emailInput
+      ],
+      'email' => [$emailInput],
+      'regex' => [
+        [[$primaryPhoneNumberInput, $secondaryPhoneNumberInput], $phoneNumberRegex],
+      ],
+      'different' => [
+        [$primaryFirstNameInput, $primaryLastNameInput],
+        [$primaryFirstNameInput, $secondaryFirstNameInput],
+        [$secondaryFirstNameInput, $primaryFirstNameInput],
+        [$secondaryFirstNameInput, $secondaryLastNameInput],
+        [$primaryPhoneNumberInput, $secondaryPhoneNumberInput],
+        [$secondaryPhoneNumberInput, $primaryPhoneNumberInput]
+      ],
+      'lengthMax' => [
+        [[
+          $primaryFirstNameInput,
+          $primaryLastNameInput,
+          $secondaryFirstNameInput,
+          $secondaryLastNameInput
+        ], 64]
+      ]
     ]);
-    $this->v->rule('email', $emailInput);
   }
 }
 

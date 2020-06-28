@@ -64,6 +64,10 @@ form.addEventListener("submit", function(event) {
                         // form.classList.add('was-validated');
                         Object.keys(json.errors).forEach((key) => {
                             const elem = document.getElementById(key);
+                            const invalidFeedbackElem = document.getElementById(`${key}-feedback`);
+                            if (invalidFeedbackElem) {
+                                invalidFeedbackElem.innerHTML = json.errors[key].join("<br />")
+                            }
                             elem.classList.add('is-invalid');
                         })
                         showError(JSON.stringify(json.errors, null, 4));
