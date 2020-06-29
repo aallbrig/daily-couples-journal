@@ -34,6 +34,31 @@ abstract class ApiValidator {
       return true;
     }, '{field} is invalid -- this payment is already associated with an order!');
 
+    $this->v->addInstanceRule('paymentIntentIdNotAlreadyStored', function ($field, $value, $params, $fields) {
+      $db = new PersistenceStore();
+      $dbResults = $db->retrieveProductOrderByPaymentIntentId($value);
+      // is the stripe result payment ID already in DB?
+      if (count($dbResults) > 0) {
+        return false;
+      }
+      return true;
+    }, '');
+
+    $this->v->addInstanceRule('validPaymentIntentId', function ($field, $value, $params, $fields) {
+      $shop = new Shop();
+      $paymentIntent = $shop->retrievePaymentIntentById($value);
+      if (is_a($paymentIntent, 'Stripe\Exception\InvalidRequestException')) {
+        return false;
+      }
+      if (is_a($paymentIntent, 'Stripe\Exception\ApiConnectionException')) {
+        return false;
+      }
+      if ($paymentIntent->last_payment_error != null) {
+        return false;
+      }
+      return true;
+    }, '{field} is not a valid payment intent id');
+
     $this->v->addInstanceRule('validProductId', function ($field, $value, $params, $fields) {
       $shop = new Shop();
       $product = $shop->retrieveProductById($value);
@@ -175,6 +200,24 @@ class CreatePaymentIntentValidator extends ApiValidator
   }
 }
 
+class UpdatePaymentIntentValidator extends ApiValidator
+{
+  public function __construct($dataToValidate)
+  {
+    parent::__construct($dataToValidate);
+
+    $this->v->rules([
+      'required' => [
+        'paymentIntentId',
+        'payload'
+      ],
+      'validPaymentIntentId' => ['paymentIntentId'],
+      'paymentIntentIdNotAlreadyStored' => ['paymentIntentId'],
+      'email' => ['payload.receipt_email']
+    ]);
+  }
+}
+
 class ApiRequest
 {
   public $body;
@@ -262,8 +305,14 @@ class Api
   public function updatePaymentIntent() {
     $body = $this->apiRequest->body;
     $payment = new Shop();
+    $v = new UpdatePaymentIntentValidator($body);
 
-    // TODO: Validation!
+    if (!$v->validate()) {
+      http_response_code(400);
+      echo json_encode([ 'errors' => $v->errors() ]);
+      exit;
+    }
+
     $validReceiptEmail = $body->payload->receipt_email;
     $validPaymentIntentId = $body->paymentIntentId;
     $validUpdatePayload = ['receipt_email' => $validReceiptEmail];
