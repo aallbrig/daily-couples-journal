@@ -1,9 +1,10 @@
 <?php
-// TODO: Hide away this product retrieval in some sort of controller
-\Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
-$price = \Stripe\Price::retrieve($_ENV["STRIPE_PRICE_ID"]);
-$product = \Stripe\Product::retrieve($price->product);
-// HACKS: Drop last two characters because stripe represents $16 as 1600
+
+$shop = new Shop();
+$price = $shop->retrievePriceById($_ENV["STRIPE_PRICE_ID"]);
+$product = $shop->retrieveProductById($price->product);
+
+// HACK: Drop last two characters because stripe represents $16 as 1600
 $priceStr = money_format('$%.2n', substr($price->unit_amount, 0, -2));
 ?>
 <div class="container">

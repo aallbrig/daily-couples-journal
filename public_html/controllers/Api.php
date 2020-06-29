@@ -34,6 +34,33 @@ abstract class ApiValidator {
       return true;
     }, '{field} is invalid -- this payment is already associated with an order!');
 
+    $this->v->addInstanceRule('validProductId', function ($field, $value, $params, $fields) {
+      $shop = new Shop();
+      $product = $shop->retrieveProductById($value);
+      if (is_a($product, 'Stripe\Exception\InvalidRequestException')) {
+        return false;
+      }
+      if (is_a($product, 'Stripe\Exception\ApiConnectionException')) {
+        return false;
+      }
+      return true;
+    }, '{field} is not a valid product id');
+
+    $this->v->addInstanceRule('validPriceId', function ($field, $value, $params, $fields) {
+      if ($value != $_ENV['STRIPE_PRICE_ID']) {
+        return false;
+      }
+      $shop = new Shop();
+      $price = $shop->retrievePriceById($value);
+      if (is_a($price, 'Stripe\Exception\InvalidRequestException')) {
+        return false;
+      }
+      if (is_a($price, 'Stripe\Exception\ApiConnectionException')) {
+        return false;
+      }
+      return true;
+    }, '{field} is not a valid price id');
+
     $this->v->addInstanceRule('validStripeResult', function ($field, $value, $params, $fields) {
       $shop = null;
       $json = json_decode($value);
@@ -60,7 +87,6 @@ abstract class ApiValidator {
       }
       return true;
     }, '{field} is invalid - please reload and try again');
-
   }
 
   public function validate() {
@@ -132,6 +158,23 @@ class SaveProductValidator extends ApiValidator
   }
 }
 
+class CreatePaymentIntentValidator extends ApiValidator
+{
+  public function __construct($dataToValidate)
+  {
+    parent::__construct($dataToValidate);
+
+    $this->v->rules([
+      'required' => [
+        'items',
+        'currency'
+      ],
+      'validProductId' => ['items.*.id'],
+      'validPriceId' => ['items.*.priceId']
+    ]);
+  }
+}
+
 class ApiRequest
 {
   public $body;
@@ -163,7 +206,6 @@ class Api
     $body = $this->apiRequest->body;
     $v = new SaveProductValidator($body);
 
-    // TODO: Validation
     if (!$v->validate()) {
       http_response_code(400);
       echo json_encode([ 'errors' => $v->errors() ]);
@@ -203,9 +245,15 @@ class Api
 
   public function createPaymentIntent() {
     $body = $this->apiRequest->body;
-    $payment = new Shop();
+    $v = new CreatePaymentIntentValidator($body);
 
-    // TODO: Validation!
+    if (!$v->validate()) {
+      http_response_code(400);
+      echo json_encode([ 'errors' => $v->errors() ]);
+      exit;
+    }
+
+    $payment = new Shop();
     $response = $payment->createPaymentIntent($body->items, $body->currency);
 
     return json_encode($response);
