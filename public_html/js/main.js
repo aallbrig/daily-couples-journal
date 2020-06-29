@@ -1,3 +1,4 @@
+// TODO: This file is a mess, lol
 // TODO: These global variables seem to make the code smelly
 let Card;
 let ClientSecret;
@@ -18,8 +19,9 @@ const inputIds = [
     'secondary_lastname',
     'secondary_phonenumber'
 ];
+
 inputIds.forEach((inputId) => {
-    document.getElementById(inputId).addEventListener('blur', (e) => {
+    document.getElementById(inputId).addEventListener(inputId === 'start_date' ? 'blur' : 'change', (e) => {
         if (e.target.checkValidity()) {
             e.target.classList.remove('is-invalid');
             e.target.classList.add('is-valid');
@@ -29,11 +31,28 @@ inputIds.forEach((inputId) => {
         }
     })
 })
-document.getElementById('email').addEventListener('change', (e) => {
+document.getElementById('email').addEventListener('blur', (e) => {
     if (e.target.checkValidity()) {
        const emailValue = e.target.value;
        updatePaymentIntent(paymentIntentId, emailValue);
     }
+});
+
+[
+    'primary_firstname',
+    'primary_phonenumber',
+    'secondary_firstname',
+    'secondary_phonenumber'
+].forEach((inputId) => {
+    document.getElementById(inputId).addEventListener('change', (e) => {
+        const [who, what] = inputId.split('_');
+        const oppositeWho = (who === 'primary' ? 'secondary': 'primary');
+        const oppositeElem = document.getElementById(`${oppositeWho}_${what}`);
+        if (oppositeElem.checkValidity()) {
+            oppositeElem.classList.remove('is-invalid');
+            oppositeElem.classList.add('is-valid');
+        }
+    });
 });
 
 fetch("/api/create-payment-intent.php", {
