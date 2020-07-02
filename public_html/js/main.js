@@ -1,4 +1,4 @@
-// TODO: This file is a mess, lol
+// TODO: This file is a mess, lol +1
 // TODO: These global variables seem to make the code smelly
 let Card;
 let ClientSecret;
@@ -25,6 +25,12 @@ inputIds.forEach((inputId) => {
         if (e.target.checkValidity()) {
             e.target.classList.remove('is-invalid');
             e.target.classList.add('is-valid');
+
+            if (inputId === 'start_date') {
+                const date = new Date(e.target.value);
+                const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                document.querySelector('.sr-result #start_date').textContent = date.toLocaleDateString('en-US', dateOptions);
+            }
         } else {
             e.target.classList.remove('is-valid');
             e.target.classList.add('is-invalid');
@@ -197,17 +203,11 @@ const updatePaymentIntent = (paymentIntentId, email) => {
 
 /* Shows a success / error message when the payment is complete */
 const orderComplete = function(clientSecret) {
-    stripe.retrievePaymentIntent(clientSecret).then(function(result) {
-        var paymentIntent = result.paymentIntent;
-        var paymentIntentJson = JSON.stringify(paymentIntent, null, 2);
-
+    stripe.retrievePaymentIntent(clientSecret).then(function() {
         document.querySelector("#payment-form").classList.add("d-none");
-        document.querySelector("pre").textContent = paymentIntentJson;
 
         document.querySelector(".sr-result").classList.remove("d-none");
-        setTimeout(function() {
-            document.querySelector(".sr-result").classList.add("d-block");
-        }, 200);
+        document.querySelector(".sr-result").classList.remove("d-none");
     });
 };
 

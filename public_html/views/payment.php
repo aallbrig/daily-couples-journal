@@ -6,6 +6,8 @@ $product = $shop->retrieveProductById($price->product);
 
 // HACK: Drop last two characters because stripe represents $16 as 1600
 $priceStr = money_format('$%.2n', substr($price->unit_amount, 0, -2));
+$tomorrow = date("Y-m-d", strtotime("+1 day"));
+$oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 day"));
 ?>
 <div class="container">
     <form id="payment-form" class="needs-validation" novalidate="">
@@ -70,7 +72,7 @@ $priceStr = money_format('$%.2n', substr($price->unit_amount, 0, -2));
                 <div class="form-group row">
                     <label for="date-input" class="col-2 col-form-label">Date</label>
                     <div class="col-10">
-                        <input id="start_date" name="start_date" class="form-control" type="date" value="<?php echo date("Y-m-d", strtotime("+1 day")); ?>" min="<?php echo date("Y-m-d", strtotime("+1 day")); ?>" max="<?php echo date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 day")); ?>" required>
+                        <input id="start_date" name="start_date" class="form-control" type="date" value="<?php echo $tomorrow; ?>" min="<?php echo $tomorrow; ?>" max="<?php echo $oneYearFromToday; ?>" required>
                         <small class="form-text text-muted">You will receive texts starting as soon as tomorrow!</small>
                     </div>
                 </div>
@@ -121,16 +123,25 @@ $priceStr = money_format('$%.2n', substr($price->unit_amount, 0, -2));
         <div class="sr-field-error alert alert-danger" role="alert" style="white-space: pre;"></div>
     </div>
 
-    <div class="sr-result d-none alert alert-success" role="alert">
-        <h3 class="text-center">Payment Complete!</h3>
-        <pre>
-            <code></code>
-        </pre>
+    <div class="sr-result d-none">
+        <div class="modal" style="display: block" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Payment Complete!</h4>
+                    </div>
+                    <div class="modal-body">
+                        <h5>Next Steps...</h5>
+                        <p>Congrats on signing up for this experience!</p>
+                        <p>You will receive texts as a couple starting on <b id="start_date"><?php echo $tomorrow; ?></b>.</p>
+                        <p>Once you receive the text for the day, it will be up to the two of you to have the conversation!</p>
+                        <p>Remember to have fun! 📱</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <footer class="my-5 pt-5 text-muted text-center text-small">
-        <p class="mb-1">© 2020-2020 Allbright Corp</p>
-    </footer>
     <script>
         const orderData = {
             items: [{
