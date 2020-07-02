@@ -4,6 +4,7 @@ use Stripe\Price;
 use Stripe\PaymentIntent;
 use Stripe\Product;
 use Stripe\Exception;
+use Stripe\Coupon;
 
 // TODO: What happens if program can't connect to Stripe APIs?
 // TODO: Error handling while interacting with external API
@@ -84,6 +85,14 @@ class Shop
   public function retrieveProductById($productId) {
     try {
       return Product::retrieve($productId);
+    } catch (Exception\ApiErrorException $e) {
+      return $e;
+    }
+  }
+
+  public function retrieveCouponByCouponId($couponId) {
+    try {
+      return Coupon::retrieve($couponId);
     } catch (Exception\ApiErrorException $e) {
       return $e;
     }

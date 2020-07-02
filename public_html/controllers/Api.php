@@ -218,6 +218,18 @@ class UpdatePaymentIntentValidator extends ApiValidator
   }
 }
 
+class CouponCodeValidator extends ApiValidator
+{
+  public function __construct($dataToValidate)
+  {
+    parent::__construct($dataToValidate);
+
+    $this->v->rules([
+      'required' => ['couponCode']
+    ]);
+  }
+}
+
 class ApiRequest
 {
   public $body;
@@ -245,15 +257,19 @@ class Api
     $this->apiRequest = new ApiRequest();
   }
 
-  public function saveProduct() {
-    $body = $this->apiRequest->body;
-    $v = new SaveProductValidator($body);
+  private function validationProcess($validator, $body) {
+    $v = new $validator($body);
 
     if (!$v->validate()) {
       http_response_code(400);
       echo json_encode([ 'errors' => $v->errors() ]);
       exit;
     }
+  }
+
+  public function saveProduct() {
+    $body = $this->apiRequest->body;
+    $this->validationProcess(SaveProductValidator::class, $body);
 
     $db = new PersistenceStore();
     $validPrimaryFirstName = $body->primary_firstname;
@@ -288,13 +304,7 @@ class Api
 
   public function createPaymentIntent() {
     $body = $this->apiRequest->body;
-    $v = new CreatePaymentIntentValidator($body);
-
-    if (!$v->validate()) {
-      http_response_code(400);
-      echo json_encode([ 'errors' => $v->errors() ]);
-      exit;
-    }
+    $this->validationProcess(CreatePaymentIntentValidator::class, $body);
 
     $payment = new Shop();
     $response = $payment->createPaymentIntent($body->items, $body->currency);
@@ -304,15 +314,9 @@ class Api
 
   public function updatePaymentIntent() {
     $body = $this->apiRequest->body;
+    $this->validationProcess(UpdatePaymentIntentValidator::class, $body);
+
     $payment = new Shop();
-    $v = new UpdatePaymentIntentValidator($body);
-
-    if (!$v->validate()) {
-      http_response_code(400);
-      echo json_encode([ 'errors' => $v->errors() ]);
-      exit;
-    }
-
     $validReceiptEmail = $body->payload->receipt_email;
     $validPaymentIntentId = $body->paymentIntentId;
     $validUpdatePayload = ['receipt_email' => $validReceiptEmail];
@@ -320,5 +324,25 @@ class Api
     $response = $payment->updatePaymentIntent($validPaymentIntentId, $validUpdatePayload);
 
     return json_encode($response);
+  }
+
+  public function retrieveCouponByCouponCode() {
+    $body = $this->apiRequest->body;
+    $this->validationProcess(CouponCodeValidator::class, $body);
+
+    $shop = new Shop();
+    $response = $shop->retrieveCouponByCouponId($body->couponCode);
+
+    if (is_a($response, 'Stripe\Coupon')) {
+      return json_encode([
+        'id' => $response->id,
+        'name' => $response->name,
+        'percent_off' => $response->percent_off
+      ]);
+    } else {
+      // Not a valid coupon
+      http_response_code(400);
+      return json_encode([ 'errors' => 'Invalid coupon' ]);
+    }
   }
 }
