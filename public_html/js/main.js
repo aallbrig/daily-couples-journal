@@ -36,7 +36,8 @@ inputIds.forEach((inputId) => {
             e.target.classList.add('is-invalid');
         }
     })
-})
+});
+
 document.getElementById('email').addEventListener('blur', (e) => {
     if (e.target.checkValidity()) {
        const emailValue = e.target.value;
@@ -73,7 +74,7 @@ fetch("/api/create-payment-intent.php", {
         paymentIntentId = json.paymentIntentId
         return setupElements(json)
     })
-    .then(function({ stripe, card, clientSecret }) {
+    .then(({ stripe, card, clientSecret }) => {
         Card = card;
         ClientSecret = clientSecret;
         document.querySelector("button").disabled = false;
@@ -138,7 +139,7 @@ form.addEventListener("submit", async (event) => {
 });
 
 // Set up Stripe.js and Elements to use in checkout form
-const setupElements = function(data) {
+const setupElements = (data) => {
     stripe = Stripe(data.publishableKey);
     const elements = stripe.elements();
     const style = {
@@ -167,13 +168,13 @@ const setupElements = function(data) {
     };
 };
 
-const pay = function(stripe, card, clientSecret) {
+const pay = (stripe, card, clientSecret) => {
     return new Promise((resolve, reject) => {
         (payOnceResult ?
             new Promise((res) => res(payOnceResult))
             : stripe.confirmCardPayment(clientSecret, { payment_method: { card: card } })
         )
-            .then(function(result) {
+            .then((result) => {
                 if (result.error) {
                     reject(result.error);
                 } else {
@@ -202,8 +203,8 @@ const updatePaymentIntent = (paymentIntentId, email) => {
 /* ------- Post-payment helpers ------- */
 
 /* Shows a success / error message when the payment is complete */
-const orderComplete = function(clientSecret) {
-    stripe.retrievePaymentIntent(clientSecret).then(function() {
+const orderComplete = (clientSecret) => {
+    stripe.retrievePaymentIntent(clientSecret).then(() => {
         document.querySelector("#payment-form").classList.add("d-none");
 
         document.querySelector(".sr-result").classList.remove("d-none");
@@ -211,11 +212,11 @@ const orderComplete = function(clientSecret) {
     });
 };
 
-const showError = function(errorMsgText) {
+const showError = (errorMsgText) => {
     document.querySelector(".form-errors").classList.remove("d-none");
     const errorMsg = document.querySelector(".sr-field-error");
     errorMsg.textContent = errorMsgText;
-    setTimeout(function() {
+    setTimeout(() => {
         document.querySelector(".form-errors").classList.add("d-none");
         errorMsg.textContent = "";
     }, 10000);

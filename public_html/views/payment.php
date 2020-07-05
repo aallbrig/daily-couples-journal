@@ -1,11 +1,28 @@
 <?php
+function priceToStr($price) {
+    // HACK: Drop last two characters because stripe represents $16 as 1600
+    return money_format('$%.2n', substr($price->unit_amount, 0, -2));
+}
+
+function sumPrice($prices) {
+    $total = 0;
+    foreach ($prices as $p) {
+        $total += $p->unit_amount;
+    }
+    return money_format('$%.2n', substr($total, 0, -2));
+}
+
+class PriceProduct {
+    public $price;
+    public $product;
+}
 
 $shop = new Shop();
-$price = $shop->retrievePriceById($_ENV["STRIPE_PRICE_ID"]);
-$product = $shop->retrieveProductById($price->product);
+$smsJournalProduct = new PriceProduct();
+$smsJournalProduct->price = $shop->retrievePriceById($_ENV["STRIPE_PRICE_ID"]);
+$smsJournalProduct->product = $shop->retrieveProductById($smsJournalProduct->price->product);
+$priceProducts = [$smsJournalProduct];
 
-// HACK: Drop last two characters because stripe represents $16 as 1600
-$priceStr = money_format('$%.2n', substr($price->unit_amount, 0, -2));
 $tomorrow = date("Y-m-d", strtotime("+1 day"));
 $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 day"));
 ?>
@@ -32,7 +49,11 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
                 </div>
                 <div>
                     <label for="primary_phonenumber">Phone Number</label>
-                    <input id="primary_phonenumber" name="primary_phonenumber" class="form-control" type="text" required>
+                    <input id="primary_phonenumber"
+                           name="primary_phonenumber"
+                           class="form-control"
+                           type="tel"
+                           required>
                     <div id="primary_phonenumber-feedback" class="invalid-feedback">
                         Please input a valid phone number
                     </div>
@@ -55,7 +76,11 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
                 </div>
                 <div>
                     <label for="secondary_phonenumber">Phone Number</label>
-                    <input id="secondary_phonenumber" name="secondary_phonenumber" class="form-control" type="text" required>
+                    <input id="secondary_phonenumber"
+                           name="secondary_phonenumber"
+                           class="form-control"
+                           type="tel"
+                           required>
                     <div id="secondary_phonenumber-feedback" class="invalid-feedback">
                         Please input a valid phone number
                     </div>
@@ -90,15 +115,23 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
                     <span class="badge badge-secondary badge-pill">1</span>
                 </h4>
                 <ul class="list-group mb-3">
+                    <?php
+                        foreach ($priceProducts as $pp) {
+                           echo '
                     <li class="list-group-item d-flex justify-content-between lh-condensed">
                         <div>
-                            <h6 class="my-0"><?php echo $product->name; ?></h6>
+                            <h6 class="my-0">' . $pp->product->name . '</h6>
                         </div>
-                        <span class="text-muted"><?php echo $priceStr; ?></span>
+                        <span class="text-muted">' . priceToStr($pp->price) . '</span>
                     </li>
+                           ';
+                        }
+                    ?>
                     <li class="list-group-item d-flex justify-content-between">
                         <span>Total (USD)</span>
-                        <strong><?php echo $priceStr; ?></strong>
+                        <strong><?php echo sumPrice(array_map(function ($pp) {
+                            return $pp->price;
+                          }, $priceProducts)); ?></strong>
                     </li>
                 </ul>
                 <label for="card-element">Credit or debit card</label>
@@ -144,10 +177,17 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
 
     <script>
         const orderData = {
-            items: [{
-                id: "<?php echo $product->id; ?>",
-                priceId: "<?php echo $price->id; ?>"
-            }],
+            items: [
+                <?php
+                    foreach ($priceProducts as $pp) {
+                        echo '{
+                    id: "' . $pp->product->id . '",
+                    priceId: "' . $pp->price->id . '"
+                },';
+                    }
+                ?>
+
+            ],
             currency: "usd"
         };
     </script>

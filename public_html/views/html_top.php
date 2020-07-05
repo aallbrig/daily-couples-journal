@@ -21,10 +21,12 @@
     <!-- CSS from other bootstrap pages -->
     <link rel="stylesheet" href="https://getbootstrap.com/docs/4.5/examples/product/product.css" crossorigin="anonymous">
 
-    <title><?php
-        if (!empty($title)) {
-            echo $title;
-        }
-    ?></title>
+    <title>
+        <?php
+            if (!empty($title)) {
+                echo $title;
+            }
+        ?>
+    </title>
   </head>
   <body>
