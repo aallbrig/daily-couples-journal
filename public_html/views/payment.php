@@ -112,7 +112,7 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
             <div class="col-md-6 offset-md-3 order-md-2 mb-4">
                 <h4 class="d-flex justify-content-between align-items-center mb-4">
                     <span class="text-muted">Your cart</span>
-                    <span class="badge badge-secondary badge-pill">1</span>
+                    <span class="badge badge-secondary badge-pill"><?php echo count($priceProducts); ?></span>
                 </h4>
                 <ul class="list-group mb-3">
                     <?php
