@@ -6,8 +6,92 @@ let stripe;
 let paymentIntentId;
 let payOnceResult = null;
 
+const moneyFormatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2
+})
+
+const recalculateCartTotal = () => {
+    const displayPrice = document.getElementById('display_price');
+    const cart = document.getElementById('cart_list');
+    const currentList = cart.getElementsByTagName('li');
+    const total = Array.from(currentList)
+        // The last item is the display price
+        .slice(0, currentList.length - 1)
+        .reduce((total, currentLi) => {
+            // Assumes there is only one span in the li
+            const [span] = currentLi.getElementsByTagName('span');
+
+            if (span.classList.contains('price')) {
+                total += parseFloat(span.textContent.replace(/\$/, ''));
+            } else if (span.classList.contains('coupon') && span.classList.contains('percent-off')) {
+                const percentOffDecimal = parseFloat(span.textContent.replace(/-/, '').replace(/%/, '')) / 100;
+                total = total - (total * percentOffDecimal);
+            }
+
+            return total;
+        }, 0);
+
+    displayPrice.textContent = `${moneyFormatter.format(total)}`;
+};
+
+const cartItem = (name, price) => {
+    // Create DOM nodes from inside out
+    const itemName = document.createElement('h6');
+    itemName.classList.add('my-0');
+    itemName.textContent = name;
+
+    const div = document.createElement('div');
+    div.appendChild(itemName)
+
+    const span = document.createElement('span');
+    span.classList.add('text-muted', 'coupon', 'percent-off');
+    span.textContent = price;
+
+    const li = document.createElement('li');
+    li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'lh-condensed');
+    li.append(div, span);
+
+    return li;
+};
+
+const appendCartItem = (itemName, itemPrice) => {
+    const cart = document.getElementById('cart_list');
+    const currentList = cart.getElementsByTagName('li');
+    const newCartItem = cartItem(itemName, itemPrice);
+    // The last item in the list is a total
+    const priceListItem = currentList[currentList.length - 1];
+    cart.insertBefore(newCartItem, priceListItem);
+};
+
 // Disable the button until we have Stripe set up on the page
 document.querySelector("button").disabled = true;
+
+document
+    .getElementById('coupon_code_btn')
+    .addEventListener('click', async (e) => {
+        e.preventDefault();
+        const ccInput = document.getElementById('coupon_code');
+        if (ccInput.checkValidity()) {
+            const couponCode = ccInput.value;
+            const res = await fetch("/api/verify-coupon-code.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    couponCode
+                })
+            });
+
+            if (res.status === 200) {
+                const json = await res.json();
+                appendCartItem(`${json.name} coupon`, `- ${json.percent_off} %`)
+                recalculateCartTotal();
+            }
+        }
+    });
 
 const inputIds = [
     'email',

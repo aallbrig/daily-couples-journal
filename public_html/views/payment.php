@@ -114,7 +114,7 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
                     <span class="text-muted">Your cart</span>
                     <span class="badge badge-secondary badge-pill"><?php echo count($priceProducts); ?></span>
                 </h4>
-                <ul class="list-group mb-3">
+                <ul id="cart_list" class="list-group mb-3">
                     <?php
                         foreach ($priceProducts as $pp) {
                            echo '
@@ -122,20 +122,33 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
                         <div>
                             <h6 class="my-0">' . $pp->product->name . '</h6>
                         </div>
-                        <span class="text-muted">' . priceToStr($pp->price) . '</span>
+                        <span class="text-muted price">' . priceToStr($pp->price) . '</span>
                     </li>
                            ';
                         }
                     ?>
                     <li class="list-group-item d-flex justify-content-between">
                         <span>Total (USD)</span>
-                        <strong><?php echo sumPrice(array_map(function ($pp) {
+                        <strong id="display_price"><?php echo sumPrice(array_map(function ($pp) {
                             return $pp->price;
                           }, $priceProducts)); ?></strong>
                     </li>
                 </ul>
+
                 <label for="card-element">Credit or debit card</label>
                 <div id="card-element" class="form-control" style="height: 2.4em; padding-top: .7em; margin-bottom: .5em;"></div>
+
+                <div class="row mt-4 mb-2">
+                    <div class="col-md-2">
+                        <label for="coupon_code">Coupon</label>
+                    </div>
+                    <div class="col-md-7">
+                        <input id="coupon_code" name="coupon_code" type="text" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <button id="coupon_code_btn" class="btn btn-primary btn-block">Redeem</button>
+                    </div>
+                </div>
 
                 <label for="email">Email</label>
                 <input id="email" name="email" class="form-control" type="email" required>
