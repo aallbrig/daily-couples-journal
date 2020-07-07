@@ -25,7 +25,7 @@ const recalculateCartTotal = () => {
 
             if (span.classList.contains('price')) {
                 total += parseFloat(span.textContent.replace(/\$/, ''));
-            } else if (span.classList.contains('coupon') && span.classList.contains('percent-off')) {
+            } else if (span.classList.contains('percent-off')) {
                 const percentOffDecimal = parseFloat(span.textContent.replace(/-/, '').replace(/%/, '')) / 100;
                 total = total - (total * percentOffDecimal);
             }
@@ -36,7 +36,7 @@ const recalculateCartTotal = () => {
     displayPrice.textContent = `${moneyFormatter.format(total)}`;
 };
 
-const cartItem = (name, price) => {
+const couponCartItem = (name, price) => {
     // Create DOM nodes from inside out
     const itemName = document.createElement('h6');
     itemName.classList.add('my-0');
@@ -46,23 +46,28 @@ const cartItem = (name, price) => {
     div.appendChild(itemName)
 
     const span = document.createElement('span');
-    span.classList.add('text-muted', 'coupon', 'percent-off');
+    span.classList.add('text-muted', 'percent-off');
     span.textContent = price;
 
     const li = document.createElement('li');
-    li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'lh-condensed');
+    li.classList.add('coupon', 'list-group-item', 'd-flex', 'justify-content-between', 'lh-condensed', 'list-group-item-success');
     li.append(div, span);
 
     return li;
 };
 
-const appendCartItem = (itemName, itemPrice) => {
+const clearPreviousCoupons = () => {
+    const coupons = document.getElementById('cart_list').getElementsByClassName('coupon');
+    return Array.from(coupons).map((coupon) => coupon.remove());
+};
+
+const appendCoupon = (itemName, itemPrice) => {
     const cart = document.getElementById('cart_list');
-    const currentList = cart.getElementsByTagName('li');
-    const newCartItem = cartItem(itemName, itemPrice);
+    const currentCartItems = cart.getElementsByTagName('li');
+    const newCouponCartItem = couponCartItem(itemName, itemPrice);
     // The last item in the list is a total
-    const priceListItem = currentList[currentList.length - 1];
-    cart.insertBefore(newCartItem, priceListItem);
+    const displayPrice = currentCartItems[currentCartItems.length - 1];
+    cart.insertBefore(newCouponCartItem, displayPrice);
 };
 
 // Disable the button until we have Stripe set up on the page
@@ -87,8 +92,10 @@ document
 
             if (res.status === 200) {
                 const json = await res.json();
-                appendCartItem(`${json.name} coupon`, `- ${json.percent_off} %`)
+                clearPreviousCoupons();
+                appendCoupon(`${json.name} coupon`, `- ${json.percent_off} %`)
                 recalculateCartTotal();
+                document.getElementById('coupon_code').classList.add('is-valid');
             }
         }
     });
