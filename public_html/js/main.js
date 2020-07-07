@@ -96,6 +96,8 @@ document
                 appendCoupon(`${json.name} coupon`, `- ${json.percent_off} %`)
                 recalculateCartTotal();
                 document.getElementById('coupon_code').classList.add('is-valid');
+            } else {
+                document.getElementById('coupon_code').classList.add('is-invalid');
             }
         }
     });
