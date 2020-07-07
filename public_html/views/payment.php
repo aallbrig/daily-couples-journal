@@ -135,8 +135,10 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
                     </li>
                 </ul>
 
-                <label for="card-element">Credit or debit card</label>
-                <div id="card-element" class="form-control" style="height: 2.4em; padding-top: .7em; margin-bottom: .5em;"></div>
+                <div id="cc-section">
+                    <label for="card-element">Credit or debit card</label>
+                    <div id="card-element" class="form-control" style="height: 2.4em; padding-top: .7em; margin-bottom: .5em;"></div>
+                </div>
 
                 <div class="row mt-4 mb-2">
                     <div class="col-md-2">

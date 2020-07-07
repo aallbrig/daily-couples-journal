@@ -34,6 +34,8 @@ const recalculateCartTotal = () => {
         }, 0);
 
     displayPrice.textContent = `${moneyFormatter.format(total)}`;
+
+    return total;
 };
 
 const couponCartItem = (name, price) => {
@@ -71,7 +73,7 @@ const appendCoupon = (itemName, itemPrice) => {
 };
 
 // Disable the button until we have Stripe set up on the page
-document.querySelector("button").disabled = true;
+document.querySelector('button').disabled = true;
 
 document
     .getElementById('coupon_code_btn')
@@ -80,24 +82,35 @@ document
         const ccInput = document.getElementById('coupon_code');
         if (ccInput.checkValidity()) {
             const couponCode = ccInput.value;
-            const res = await fetch("/api/verify-coupon-code.php", {
-                method: "POST",
+            const res = await fetch('/api/verify-coupon-code.php', {
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json"
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     couponCode
                 })
             });
 
+            const couponCodeInput = document.getElementById('coupon_code');
+            clearPreviousCoupons();
             if (res.status === 200) {
                 const json = await res.json();
-                clearPreviousCoupons();
                 appendCoupon(`${json.name} coupon`, `- ${json.percent_off} %`)
-                recalculateCartTotal();
-                document.getElementById('coupon_code').classList.add('is-valid');
+                couponCodeInput.classList.remove('is-invalid');
+                couponCodeInput.classList.add('is-valid');
             } else {
-                document.getElementById('coupon_code').classList.add('is-invalid');
+                couponCodeInput.classList.remove('is-valid');
+                couponCodeInput.classList.add('is-invalid');
+            }
+
+            const ccSection = document.getElementById('cc-section')
+            const total = recalculateCartTotal();
+
+            if (total === 0) {
+                ccSection.classList.add('d-none');
+            } else {
+                ccSection.classList.remove('d-none');
             }
         }
     });
@@ -155,10 +168,10 @@ document.getElementById('email').addEventListener('blur', (e) => {
     });
 });
 
-fetch("/api/create-payment-intent.php", {
-    method: "POST",
+fetch('/api/create-payment-intent.php', {
+    method: 'POST',
     headers: {
-        "Content-Type": "application/json"
+        'Content-Type': 'application/json'
     },
     body: JSON.stringify(orderData)
 })
@@ -170,12 +183,12 @@ fetch("/api/create-payment-intent.php", {
     .then(({ stripe, card, clientSecret }) => {
         Card = card;
         ClientSecret = clientSecret;
-        document.querySelector("button").disabled = false;
+        document.querySelector('button').disabled = false;
     });
 
 // Handle form submission.
-const form = document.getElementById("payment-form");
-form.addEventListener("submit", async (event) => {
+const form = document.getElementById('payment-form');
+form.addEventListener('submit', async (event) => {
     event.preventDefault();
     event.target.classList.add('was-validated');
     if (event.target.checkValidity()) {
@@ -184,20 +197,20 @@ form.addEventListener("submit", async (event) => {
             .then((result) => {
                 // If successful, save the user's form data
                 const formData = new FormData(form);
-                formData.append("client_secret", ClientSecret);
-                formData.append("stripe_result", JSON.stringify(result));
+                formData.append('client_secret', ClientSecret);
+                formData.append('stripe_result', JSON.stringify(result));
 
-                fetch("/api/save-product.php", {
-                    method: "POST",
+                fetch('/api/save-product.php', {
+                    method: 'POST',
                     headers: {
-                        "Content-Type": "application/json"
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(Object.fromEntries(formData))
                 })
                     .then(async (result) => {
-                        if (result.status == 200) {
+                        if (result.status === 200) {
                             orderComplete(ClientSecret);
-                        } else if (result.status == 400) {
+                        } else if (result.status === 400) {
                             const json = await result.json();
 
                             inputIds.forEach((id) => {
@@ -212,7 +225,7 @@ form.addEventListener("submit", async (event) => {
                                 const elem = document.getElementById(key);
                                 const invalidFeedbackElem = document.getElementById(`${key}-feedback`);
                                 if (invalidFeedbackElem) {
-                                    invalidFeedbackElem.innerHTML = json.errors[key].join("<br />")
+                                    invalidFeedbackElem.innerHTML = json.errors[key].join('<br />')
                                 }
                                 if (elem) {
                                     elem.classList.remove('is-valid');
@@ -237,22 +250,22 @@ const setupElements = (data) => {
     const elements = stripe.elements();
     const style = {
         base: {
-            color: "#32325d",
+            color: '#32325d',
             fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-            fontSmoothing: "antialiased",
-            fontSize: "16px",
-            "::placeholder": {
-                color: "#aab7c4"
+            fontSmoothing: 'antialiased',
+            fontSize: '16px',
+            '::placeholder': {
+                color: '#aab7c4'
             }
         },
         invalid: {
-            color: "#fa755a",
-            iconColor: "#fa755a"
+            color: '#fa755a',
+            iconColor: '#fa755a'
         }
     };
 
-    const card = elements.create("card", { style: style });
-    card.mount("#card-element");
+    const card = elements.create('card', { style: style });
+    card.mount('#card-element');
 
     return {
         stripe: stripe,
@@ -279,10 +292,10 @@ const pay = (stripe, card, clientSecret) => {
 };
 
 const updatePaymentIntent = (paymentIntentId, email) => {
-   return fetch("/api/update-payment-intent.php", {
-        method: "POST",
+   return fetch('/api/update-payment-intent.php', {
+        method: 'POST',
         headers: {
-            "Content-Type": "application/json"
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             paymentIntentId: paymentIntentId,
@@ -298,19 +311,19 @@ const updatePaymentIntent = (paymentIntentId, email) => {
 /* Shows a success / error message when the payment is complete */
 const orderComplete = (clientSecret) => {
     stripe.retrievePaymentIntent(clientSecret).then(() => {
-        document.querySelector("#payment-form").classList.add("d-none");
+        document.querySelector('#payment-form').classList.add('d-none');
 
-        document.querySelector(".sr-result").classList.remove("d-none");
-        document.querySelector(".sr-result").classList.remove("d-none");
+        document.querySelector('.sr-result').classList.remove('d-none');
+        document.querySelector('.sr-result').classList.remove('d-none');
     });
 };
 
 const showError = (errorMsgText) => {
-    document.querySelector(".form-errors").classList.remove("d-none");
-    const errorMsg = document.querySelector(".sr-field-error");
+    document.querySelector('.form-errors').classList.remove('d-none');
+    const errorMsg = document.querySelector('.sr-field-error');
     errorMsg.textContent = errorMsgText;
     setTimeout(() => {
-        document.querySelector(".form-errors").classList.add("d-none");
-        errorMsg.textContent = "";
+        document.querySelector('.form-errors').classList.add('d-none');
+        errorMsg.textContent = '';
     }, 10000);
 };
