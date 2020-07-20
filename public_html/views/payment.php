@@ -134,11 +134,6 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
                     </li>
                 </ul>
 
-                <div id="cc-section">
-                    <label for="card-element">Credit or debit card</label>
-                    <div id="card-element" class="form-control" style="height: 2.4em; padding-top: .7em; margin-bottom: .5em;"></div>
-                </div>
-
                 <div class="row mt-4 mb-2">
                     <div class="col-md-2">
                         <label for="coupon_code">Coupon</label>
@@ -151,12 +146,29 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
                     </div>
                 </div>
 
-                <label for="email">Email</label>
-                <input id="email" name="email" class="form-control" type="email" required>
-                <div id="email-feedback" class="invalid-feedback">
-                    Please input a valid email address
+                <hr class="mb-4">
+
+                <div class="row mt-4 mb-4">
+                    <div class="col-md-2">
+                        <label for="email">Email</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input id="email" name="email" class="form-control" type="email" required>
+                    </div>
+                    <div class="col-12">
+                        <small class="form-text text-muted">
+                            Where can we send the receipt?
+                        </small>
+                        <div id="email-feedback" class="invalid-feedback">
+                            Please input a valid email address
+                        </div>
+                    </div>
                 </div>
-                <small class="form-text text-muted">For payment receipt.</small>
+
+                <div id="cc-section">
+                    <label for="card-element">Credit or debit card</label>
+                    <div id="card-element" class="form-control" style="height: 2.4em; padding-top: .7em; margin-bottom: .5em;"></div>
+                </div>
 
                 <hr class="mb-4">
                 <button class="btn btn-primary btn-lg btn-block" type="submit">Pay</button>
