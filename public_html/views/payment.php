@@ -1,7 +1,6 @@
 <?php
 function priceToStr($price) {
-    // HACK: Drop last two characters because stripe represents $16 as 1600
-    return money_format('$%.2n', substr($price->unit_amount, 0, -2));
+    return '$' . $price->unit_amount / 100;
 }
 
 function sumPrice($prices) {
@@ -9,7 +8,7 @@ function sumPrice($prices) {
     foreach ($prices as $p) {
         $total += $p->unit_amount;
     }
-    return money_format('$%.2n', substr($total, 0, -2));
+    return '$' . $total / 100;
 }
 
 class PriceProduct {
