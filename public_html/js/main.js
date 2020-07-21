@@ -12,6 +12,10 @@ const moneyFormatter = new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 2
 })
 
+const navigateToThankYouPage = (startDate) => {
+    window.location.href = `/thank-you.php?start_date=${startDate}`;
+};
+
 const recalculateCartTotal = () => {
     const displayPrice = document.getElementById('display_price');
     const cart = document.getElementById('cart_list');
@@ -135,12 +139,6 @@ inputIds.forEach((inputId) => {
         if (e.target.checkValidity()) {
             e.target.classList.remove('is-invalid');
             e.target.classList.add('is-valid');
-
-            if (inputId === 'start_date') {
-                const date = new Date(e.target.value);
-                const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                document.querySelector('.sr-result #start_date').textContent = date.toLocaleDateString('en-US', dateOptions);
-            }
         } else {
             e.target.classList.remove('is-valid');
             e.target.classList.add('is-invalid');
@@ -312,11 +310,13 @@ const updatePaymentIntent = (paymentIntentId, email) => {
 
 /* Shows a success / error message when the payment is complete */
 const orderComplete = async (clientSecret) => {
+    document.querySelector('#payment-form').classList.add('d-none');
     await stripe.retrievePaymentIntent(clientSecret);
 
-    document.querySelector('#payment-form').classList.add('d-none');
-    document.querySelector('.sr-result').classList.remove('d-none');
-    document.querySelector('.sr-result').classList.remove('d-none');
+    const date = new Date(document.getElementById('start_date').value);
+    const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+    navigateToThankYouPage(date.toLocaleDateString('en-US', dateOptions));
 };
 
 const showError = (errorMsgText) => {

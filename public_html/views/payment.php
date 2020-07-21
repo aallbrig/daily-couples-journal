@@ -124,9 +124,9 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
         <div class="row">
             <div class="col-md-8 offset-md-2 order-md-2 mb-4">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header text-right">
                         <span class="text-muted">Your cart</span>
-                        <span class="badge badge-secondary badge-pill"><?php echo count($priceProducts); ?></span>
+                        <span class="badge badge-primary badge-pill"><?php echo count($priceProducts); ?></span>
                     </div>
                     <div class="card-body p-0">
                         <ul id="cart_list" class="list-group list-group-flush mb-3">
@@ -200,25 +200,6 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
     <div class="form-errors d-none">
         <hr class="mb-4">
         <div class="sr-field-error alert alert-danger" role="alert" style="white-space: pre;"></div>
-    </div>
-
-    <div class="sr-result d-none">
-        <div class="modal" style="display: block" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Payment Complete!</h4>
-                    </div>
-                    <div class="modal-body">
-                        <h5>Next Steps...</h5>
-                        <p>Congrats on signing up for this experience!</p>
-                        <p>You will receive texts as a couple starting on <b id="start_date"><?php echo $tomorrow; ?></b>.</p>
-                        <p>Once you receive the text for the day, it will be up to the two of you to have the conversation!</p>
-                        <p>Remember to have fun! 📱</p>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script>
