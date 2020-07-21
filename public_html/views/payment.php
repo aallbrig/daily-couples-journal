@@ -122,6 +122,7 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
                             <h6 class="my-0">' . $pp->product->name . '</h6>
                         </div>
                         <span class="text-muted price">' . priceToStr($pp->price) . '</span>
+                        <input type="hidden" name="price" value="' . $pp->price->id . '" />
                     </li>
                            ';
                         }

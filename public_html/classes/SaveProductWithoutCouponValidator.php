@@ -1,7 +1,7 @@
 <?php
 include_once 'ApiValidator.php';
 
-class SaveProductValidator extends ApiValidator
+class SaveProductWithoutCouponValidator extends ApiValidator
 {
   public function __construct($dataToValidate)
   {
@@ -18,7 +18,7 @@ class SaveProductValidator extends ApiValidator
     $secondaryLastNameInput = 'secondary_lastname';
     $secondaryPhoneNumberInput = 'secondary_phonenumber';
     $stripeInput = 'stripe_result';
-    $couponCode = 'coupon_code';
+    $price = 'price';
 
     $this->v->rules([
       'required' => [
@@ -28,14 +28,11 @@ class SaveProductValidator extends ApiValidator
         $secondaryFirstNameInput,
         $secondaryLastNameInput,
         $secondaryPhoneNumberInput,
-        $emailInput
+        $emailInput,
+        $price,
+        $stripeInput
       ],
-      'optional' => [
-        [$stripeInput]
-      ],
-      'requiredWithout' => [
-        [$stripeInput, [$couponCode]]
-      ],
+      'validPriceId' => [$price],
       'email' => [$emailInput],
       'regex' => [
         [[$primaryPhoneNumberInput, $secondaryPhoneNumberInput], $phoneNumberRegex],

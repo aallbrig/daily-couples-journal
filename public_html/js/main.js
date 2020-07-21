@@ -1,4 +1,4 @@
-// TODO: This file is a mess, lol +1
+// TODO: This file is a mess, lol +2
 // TODO: These global variables seem to make the code smelly
 let Card;
 let ClientSecret;
@@ -96,20 +96,24 @@ document
             clearPreviousCoupons();
             if (res.status === 200) {
                 const json = await res.json();
-                appendCoupon(`${json.name} coupon`, `- ${json.percent_off} %`)
+                // HACK: Assume coupons are only "percent off"
                 couponCodeInput.classList.remove('is-invalid');
                 couponCodeInput.classList.add('is-valid');
+                appendCoupon(`${json.name} coupon`, `- ${json.percent_off} %`)
             } else {
                 couponCodeInput.classList.remove('is-valid');
                 couponCodeInput.classList.add('is-invalid');
+                couponCodeInput.value = '';
             }
 
             const ccSection = document.getElementById('cc-section')
             const total = recalculateCartTotal();
 
             if (total === 0) {
+                Card.unmount();
                 ccSection.classList.add('d-none');
             } else {
+                Card.mount();
                 ccSection.classList.remove('d-none');
             }
         }
@@ -188,59 +192,57 @@ fetch('/api/create-payment-intent.php', {
 
 // Handle form submission.
 const form = document.getElementById('payment-form');
-form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    event.target.classList.add('was-validated');
-    if (event.target.checkValidity()) {
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    e.target.classList.add('was-validated');
+    if (e.target.checkValidity()) {
         await updatePaymentIntent(paymentIntentId, document.getElementById('email').value);
-        pay(stripe, Card, ClientSecret)
-            .then((result) => {
-                // If successful, save the user's form data
-                const formData = new FormData(form);
-                formData.append('client_secret', ClientSecret);
-                formData.append('stripe_result', JSON.stringify(result));
+        const formData = new FormData(e.target);
+        formData.append('client_secret', ClientSecret);
 
-                fetch('/api/save-product.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(Object.fromEntries(formData))
-                })
-                    .then(async (result) => {
-                        if (result.status === 200) {
-                            orderComplete(ClientSecret);
-                        } else if (result.status === 400) {
-                            const json = await result.json();
+        if (recalculateCartTotal() !== 0) {
+            const stripePayment = await pay(stripe, Card, ClientSecret);
+            formData.append('stripe_result', JSON.stringify(stripePayment));
+        }
 
-                            inputIds.forEach((id) => {
-                                const elem = document.getElementById(id);
-                                if (elem.checkValidity() && elem) {
-                                    elem.classList.remove('is-invalid');
-                                    elem.classList.add('is-valid');
-                                }
-                            })
-                            event.target.classList.remove('was-validated');
-                            Object.keys(json.errors).forEach((key) => {
-                                const elem = document.getElementById(key);
-                                const invalidFeedbackElem = document.getElementById(`${key}-feedback`);
-                                if (invalidFeedbackElem) {
-                                    invalidFeedbackElem.innerHTML = json.errors[key].join('<br />')
-                                }
-                                if (elem) {
-                                    elem.classList.remove('is-valid');
-                                    elem.classList.add('is-invalid');
-                                }
-                            })
-                            showError(JSON.stringify(json.errors, null, 4));
-                        } else {
-                            showError('Something went wrong');
-                        }
-                    })
+        const saveProductOrderRes = await fetch('/api/save-product.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(Object.fromEntries(formData))
+        });
+
+        if (saveProductOrderRes.status === 200) {
+            orderComplete(ClientSecret);
+        } else if (saveProductOrderRes.status === 400) {
+            const json = await saveProductOrderRes.json();
+
+            inputIds.forEach((id) => {
+                const elem = document.getElementById(id);
+                if (elem.checkValidity() && elem) {
+                    elem.classList.remove('is-invalid');
+                    elem.classList.add('is-valid');
+                }
             })
-            .catch((error) => {
-                showError(error.message);
-            });
+
+            e.target.classList.remove('was-validated');
+            Object.keys(json.errors).forEach((key) => {
+                const elem = document.getElementById(key);
+                const invalidFeedbackElem = document.getElementById(`${key}-feedback`);
+                if (invalidFeedbackElem) {
+                    invalidFeedbackElem.innerHTML = json.errors[key].join('<br />')
+                }
+                if (elem) {
+                    elem.classList.remove('is-valid');
+                    elem.classList.add('is-invalid');
+                }
+            })
+            showError(JSON.stringify(json.errors, null, 4));
+        } else {
+            showError('Something went wrong');
+        }
     }
 });
 
@@ -309,13 +311,12 @@ const updatePaymentIntent = (paymentIntentId, email) => {
 /* ------- Post-payment helpers ------- */
 
 /* Shows a success / error message when the payment is complete */
-const orderComplete = (clientSecret) => {
-    stripe.retrievePaymentIntent(clientSecret).then(() => {
-        document.querySelector('#payment-form').classList.add('d-none');
+const orderComplete = async (clientSecret) => {
+    await stripe.retrievePaymentIntent(clientSecret);
 
-        document.querySelector('.sr-result').classList.remove('d-none');
-        document.querySelector('.sr-result').classList.remove('d-none');
-    });
+    document.querySelector('#payment-form').classList.add('d-none');
+    document.querySelector('.sr-result').classList.remove('d-none');
+    document.querySelector('.sr-result').classList.remove('d-none');
 };
 
 const showError = (errorMsgText) => {
@@ -325,5 +326,5 @@ const showError = (errorMsgText) => {
     setTimeout(() => {
         document.querySelector('.form-errors').classList.add('d-none');
         errorMsg.textContent = '';
-    }, 10000);
+    }, 15000);
 };

@@ -7,7 +7,8 @@ require '../classes/Shop.php';
 require '../classes/PersistenceStore.php';
 require '../classes/CouponCodeValidator.php';
 require '../classes/CreatePaymentIntentValidator.php';
-require '../classes/SaveProductValidator.php';
+require '../classes/SaveProductWithCouponValidator.php';
+require '../classes/SaveProductWithoutCouponValidator.php';
 require '../classes/UpdatePaymentIntentValidator.php';
 
 class Api
@@ -21,12 +22,36 @@ class Api
 
   public function saveProduct() {
     $body = $this->apiRequest->body;
-    $v = new SaveProductValidator($body);
+    $hasCoupon = $body->coupon_code !== null && $body->coupon_code != '';
 
-    if (!$v->validate()) {
-      return new ApiResponse([
-        'errors' => $v->errors()
-      ], 400);
+    if ($hasCoupon) {
+      $v = new SaveProductWithCouponValidator($body);
+
+      if (!$v->validate()) {
+        return new ApiResponse([
+          'errors' => $v->errors()
+        ], 400);
+      }
+
+      // Check if coupon makes price 100% off
+      $s = new Shop();
+      $pr = $s->retrievePriceById($body->price);
+      $c = $s->retrieveCouponByCouponId($body->coupon_code);
+      $priceAfterCoupon = $pr->unit_amount - ($pr->unit_amount * ($c->percent_off / 100));
+      // HACK: Assume coupons are only percentage off
+      if ($priceAfterCoupon !== 0.0 && $body->stripe_result === null) {
+        return new ApiResponse([
+          'errors' => ['proof_of_purchase' => 'Payment is required']
+        ]);
+      }
+    } else {
+      $v = new SaveProductWithoutCouponValidator($body);
+
+      if (!$v->validate()) {
+        return new ApiResponse([
+          'errors' => $v->errors()
+        ], 400);
+      }
     }
 
     $db = new PersistenceStore();

@@ -67,6 +67,18 @@ abstract class ApiValidator {
       return true;
     }, '{field} is not a valid product id');
 
+    $this->v->addInstanceRule('validCouponCodeId', function ($field, $value, $params, $fields) {
+      $shop = new Shop();
+      $product = $shop->retrieveCouponByCouponId($value);
+      if (is_a($product, 'Stripe\Exception\InvalidRequestException')) {
+        return false;
+      }
+      if (is_a($product, 'Stripe\Exception\ApiConnectionException')) {
+        return false;
+      }
+      return true;
+    }, '{field} is not a valid coupon code id');
+
     $this->v->addInstanceRule('validPriceId', function ($field, $value, $params, $fields) {
       if ($value != $_ENV['STRIPE_PRICE_ID']) {
         return false;

@@ -8,7 +8,8 @@ class CouponCodeValidator extends ApiValidator
     parent::__construct($dataToValidate);
 
     $this->v->rules([
-      'required' => ['couponCode']
+      'required' => ['couponCode'],
+      'validCouponCodeId' => ['couponCode']
     ]);
   }
 }
