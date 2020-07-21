@@ -28,60 +28,74 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
 <div class="container">
     <form id="payment-form" class="needs-validation" novalidate="">
         <div class="py-5 text-center">
-            <h4>Tell us more about you two!</h4>
+            <h4>Tell us more about the two of you...</h4>
         </div>
         <div class="row">
             <div class="col-md-5">
-                <div>
-                    <label for="primary_firstname">First Name</label>
-                    <input id="primary_firstname" name="primary_firstname" class="form-control" type="text" required>
-                    <div id="primary_firstname-feedback" class="invalid-feedback">
-                        Please input a valid first name
+                <div class="card mt-3">
+                    <div class="card-header">
+                        Person One
                     </div>
-                </div>
-                <div>
-                    <label for="primary_lastname">Last Name</label>
-                    <input id="primary_lastname" name="primary_lastname" class="form-control" type="text" required>
-                    <div id="primary_lastname-feedback" class="invalid-feedback">
-                        Please input a valid last name
-                    </div>
-                </div>
-                <div>
-                    <label for="primary_phonenumber">Phone Number</label>
-                    <input id="primary_phonenumber"
-                           name="primary_phonenumber"
-                           class="form-control"
-                           type="tel"
-                           required>
-                    <div id="primary_phonenumber-feedback" class="invalid-feedback">
-                        Please input a valid phone number
+                    <div class="card-body">
+                        <div>
+                            <label for="primary_firstname">First Name</label>
+                            <input id="primary_firstname" name="primary_firstname" class="form-control" type="text" required>
+                            <div id="primary_firstname-feedback" class="invalid-feedback">
+                                Please input a valid first name
+                            </div>
+                        </div>
+                        <div>
+                            <label for="primary_lastname">Last Name</label>
+                            <input id="primary_lastname" name="primary_lastname" class="form-control" type="text" required>
+                            <div id="primary_lastname-feedback" class="invalid-feedback">
+                                Please input a valid last name
+                            </div>
+                        </div>
+                        <div>
+                            <label for="primary_phonenumber">Phone Number</label>
+                            <input id="primary_phonenumber"
+                                   name="primary_phonenumber"
+                                   class="form-control"
+                                   type="tel"
+                                   required>
+                            <div id="primary_phonenumber-feedback" class="invalid-feedback">
+                                Please input a valid phone number
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-5 offset-md-1">
-                <div>
-                    <label for="secondary_firstname">First Name</label>
-                    <input id="secondary_firstname" name="secondary_firstname" class="form-control" type="text" required>
-                    <div id="secondary_firstname-feedback" class="invalid-feedback">
-                        Please input a valid first name
+                <div class="card mt-3">
+                    <div class="card-header">
+                        Person Two
                     </div>
-                </div>
-                <div>
-                    <label for="secondary_lastname">Last Name</label>
-                    <input id="secondary_lastname" name="secondary_lastname" class="form-control" type="text" required>
-                    <div id="secondary_lastname-feedback" class="invalid-feedback">
-                        Please input a valid last name
-                    </div>
-                </div>
-                <div>
-                    <label for="secondary_phonenumber">Phone Number</label>
-                    <input id="secondary_phonenumber"
-                           name="secondary_phonenumber"
-                           class="form-control"
-                           type="tel"
-                           required>
-                    <div id="secondary_phonenumber-feedback" class="invalid-feedback">
-                        Please input a valid phone number
+                    <div class="card-body">
+                        <div>
+                            <label for="secondary_firstname">First Name</label>
+                            <input id="secondary_firstname" name="secondary_firstname" class="form-control" type="text" required>
+                            <div id="secondary_firstname-feedback" class="invalid-feedback">
+                                Please input a valid first name
+                            </div>
+                        </div>
+                        <div>
+                            <label for="secondary_lastname">Last Name</label>
+                            <input id="secondary_lastname" name="secondary_lastname" class="form-control" type="text" required>
+                            <div id="secondary_lastname-feedback" class="invalid-feedback">
+                                Please input a valid last name
+                            </div>
+                        </div>
+                        <div>
+                            <label for="secondary_phonenumber">Phone Number</label>
+                            <input id="secondary_phonenumber"
+                                   name="secondary_phonenumber"
+                                   class="form-control"
+                                   type="tel"
+                                   required>
+                            <div id="secondary_phonenumber-feedback" class="invalid-feedback">
+                                Please input a valid phone number
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -92,31 +106,33 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
         </div>
 
         <div class="row">
-            <div class="col-md-6 offset-md-3 order-md-2 mb-4">
+            <div class="col-md-6 offset-md-3 order-md-2">
                 <div class="form-group row">
                     <label for="date-input" class="col-2 col-form-label">Date</label>
                     <div class="col-10">
                         <input id="start_date" name="start_date" class="form-control" type="date" value="<?php echo $tomorrow; ?>" min="<?php echo $tomorrow; ?>" max="<?php echo $oneYearFromToday; ?>" required>
-                        <small class="form-text text-muted">You will receive texts starting as soon as tomorrow!</small>
+                        <small class="form-text text-muted">You can receive texts starting as soon as tomorrow!</small>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="py-5 text-center">
+        <div class="py-3 text-center">
             <h2>Ready to start?</h2>
         </div>
 
         <div class="row">
-            <div class="col-md-6 offset-md-3 order-md-2 mb-4">
-                <h4 class="d-flex justify-content-between align-items-center mb-4">
-                    <span class="text-muted">Your cart</span>
-                    <span class="badge badge-secondary badge-pill"><?php echo count($priceProducts); ?></span>
-                </h4>
-                <ul id="cart_list" class="list-group mb-3">
-                    <?php
-                        foreach ($priceProducts as $pp) {
-                           echo '
+            <div class="col-md-8 offset-md-2 order-md-2 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="text-muted">Your cart</span>
+                        <span class="badge badge-secondary badge-pill"><?php echo count($priceProducts); ?></span>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul id="cart_list" class="list-group list-group-flush mb-3">
+                          <?php
+                          foreach ($priceProducts as $pp) {
+                            echo '
                     <li class="list-group-item d-flex justify-content-between lh-condensed">
                         <div>
                             <h6 class="my-0">' . $pp->product->name . '</h6>
@@ -125,29 +141,29 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
                         <input type="hidden" name="price" value="' . $pp->price->id . '" />
                     </li>
                            ';
-                        }
-                    ?>
-                    <li class="list-group-item d-flex justify-content-between">
-                        <span>Total (USD)</span>
-                        <strong id="display_price"><?php echo sumPrice(array_map(function ($pp) {
-                            return $pp->price;
-                          }, $priceProducts)); ?></strong>
-                    </li>
-                </ul>
-
-                <div class="row mt-4 mb-2">
-                    <div class="col-md-2">
-                        <label for="coupon_code">Coupon</label>
-                    </div>
-                    <div class="col-md-7">
-                        <input id="coupon_code" name="coupon_code" type="text" class="form-control" />
-                    </div>
-                    <div class="col-md-3">
-                        <button id="coupon_code_btn" class="btn btn-primary btn-block">Redeem</button>
+                          }
+                          ?>
+                            <li class="list-group-item d-flex justify-content-between"
+                                style="border-bottom-width: 1px;">
+                                <span>Total (USD)</span>
+                                <strong id="display_price"><?php echo sumPrice(array_map(function ($pp) {
+                                    return $pp->price;
+                                  }, $priceProducts)); ?></strong>
+                            </li>
+                        </ul>
+                        <div class="row m-0 mb-3">
+                            <div class="col-md-2">
+                                <label for="coupon_code">Coupon</label>
+                            </div>
+                            <div class="col-md-7">
+                                <input id="coupon_code" name="coupon_code" type="text" class="form-control" />
+                            </div>
+                            <div class="col-md-3">
+                                <button id="coupon_code_btn" class="btn btn-primary btn-block">Redeem</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <hr class="mb-4">
 
                 <div class="row mt-4 mb-4">
                     <div class="col-md-2">
@@ -158,7 +174,7 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
                     </div>
                     <div class="col-12">
                         <small class="form-text text-muted">
-                            Where can we send the receipt?
+                            Where should we send your receipt?
                         </small>
                         <div id="email-feedback" class="invalid-feedback">
                             Please input a valid email address
