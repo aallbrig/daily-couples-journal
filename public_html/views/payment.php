@@ -65,7 +65,7 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
                     </div>
                 </div>
             </div>
-            <div class="col-md-5 offset-md-1">
+            <div class="col-md-5 offset-md-2">
                 <div class="card mt-3">
                     <div class="card-header">
                         Person Two
@@ -134,10 +134,13 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
                           foreach ($priceProducts as $pp) {
                             echo '
                     <li class="list-group-item d-flex justify-content-between lh-condensed">
-                        <div>
-                            <h6 class="my-0">' . $pp->product->name . '</h6>
+                        <div class="mr-3">
+                            <h6 class="my-0 mb-2">' . $pp->product->name . '</h6>
+                            <p class="text-muted">
+                                ' . $pp->product->description . '
+                            </p>
                         </div>
-                        <span class="text-muted price">' . priceToStr($pp->price) . '</span>
+                        <span class="price">' . priceToStr($pp->price) . '</span>
                         <input type="hidden" name="price" value="' . $pp->price->id . '" />
                     </li>
                            ';
@@ -145,7 +148,7 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
                           ?>
                             <li class="list-group-item d-flex justify-content-between"
                                 style="border-bottom-width: 1px;">
-                                <span>Total (USD)</span>
+                                <strong>Total (USD)</strong>
                                 <strong id="display_price"><?php echo sumPrice(array_map(function ($pp) {
                                     return $pp->price;
                                   }, $priceProducts)); ?></strong>
