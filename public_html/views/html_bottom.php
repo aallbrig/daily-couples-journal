@@ -1,6 +1,6 @@
     <div class="container">
         <footer class="my-5 pt-5 text-muted text-center text-small">
-            <p class="mb-1">© 2020-2020 Allbright Corp</p>
+            <p class="mb-1">© 2020-2020 Allbright Web Services LLC</p>
         </footer>
     </div>
     <!-- Optional JavaScript -->
