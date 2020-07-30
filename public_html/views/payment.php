@@ -32,7 +32,7 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
         </div>
         <div class="row">
             <div class="col-md-5">
-                <div class="card mt-3">
+                <div class="card shadow-sm mt-3">
                     <div class="card-header">
                         Person One
                     </div>
@@ -66,7 +66,7 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
                 </div>
             </div>
             <div class="col-md-5 offset-md-2">
-                <div class="card mt-3">
+                <div class="card shadow-sm mt-3">
                     <div class="card-header">
                         Person Two
                     </div>
@@ -123,7 +123,7 @@ $oneYearFromToday = date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 da
 
         <div class="row">
             <div class="col-md-8 offset-md-2 order-md-2 mb-4">
-                <div class="card">
+                <div class="card shadow-sm">
                     <div class="card-header text-right">
                         <span class="text-muted">Your cart</span>
                         <span class="badge badge-primary badge-pill"><?php echo count($priceProducts); ?></span>
