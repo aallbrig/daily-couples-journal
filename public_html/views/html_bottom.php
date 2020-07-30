@@ -1,6 +1,6 @@
     <div class="container">
         <footer class="my-5 pt-5 text-muted text-center text-small">
-            <p class="mb-1">© 2020-2020 Allbright Web Services LLC</p>
+            <p class="mb-1">© 2020-<?php echo date("Y"); ?> <a href="http://www.allbrightwebservices.com/">Allbright Web Services LLC</a></p>
         </footer>
     </div>
     <!-- Optional JavaScript -->
