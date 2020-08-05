@@ -5,7 +5,7 @@ class ApiResponse
   public $statusCode;
   public $jsonPayload;
 
-  public function __construct($jsonBody, $statusCode = 200)
+  public function __construct($jsonBody = [], $statusCode = 200)
   {
     $this->jsonPayload = $jsonBody;
     $this->statusCode = $statusCode;
@@ -15,6 +15,7 @@ class ApiResponse
   {
     header('Content-Type: application/json');
     http_response_code($this->statusCode);
+
     return json_encode($this->jsonPayload);
   }
 }

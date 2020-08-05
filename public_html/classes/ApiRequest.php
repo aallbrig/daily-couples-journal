@@ -2,13 +2,14 @@
 
 class ApiRequest
 {
+  public $raw;
   public $body;
 
   public function __construct()
   {
     header('Content-Type: application/json');
-    $input = file_get_contents('php://input');
-    $this->body = json_decode($input);
+    $this->raw = file_get_contents('php://input');
+    $this->body = json_decode($this->raw);
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST' || json_last_error() !== JSON_ERROR_NONE) {
       http_response_code(400);
