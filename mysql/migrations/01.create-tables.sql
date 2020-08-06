@@ -17,9 +17,24 @@ CREATE TABLE product_order (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     couple_id INT,
     start_date DATETIME,
-    stripe_result JSON,
+    active TINYINT(1),
     FOREIGN KEY (couple_id) REFERENCES couple(id)
 );
+
+CREATE TABLE stripe_data (
+    payment_intent_id VARCHAR(128) NOT NULL PRIMARY KEY,
+    charge_id VARCHAR(128),
+    coupon_id VARCHAR(128)
+);
+
+CREATE TABLE product_order_to_stripe_data (
+      product_order_id INT,
+      stripe_data_payment_intent_id VARCHAR(128),
+      FOREIGN KEY (stripe_data_payment_intent_id) REFERENCES stripe_data(payment_intent_id),
+      FOREIGN KEY (product_order_id) REFERENCES product_order(id),
+      PRIMARY KEY (product_order_id, stripe_data_payment_intent_id)
+);
+
 
 CREATE TABLE daily_question (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
