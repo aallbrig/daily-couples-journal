@@ -29,8 +29,36 @@ class PersistenceStore
     return insertCouple($this->conn, $primaryPersonId, $secondaryPersonId);
   }
 
-  public function saveProductOrder($coupleId, $startDate, $paymentResultJSON) {
-    return insertProductOrder($this->conn, $coupleId, $startDate, $paymentResultJSON);
+  public function saveProductOrder($coupleId, $startDate, $active) {
+    return insertProductOrder($this->conn, $coupleId, $startDate, $active);
+  }
+
+  public function savePaymentIntentId($paymentIntentId) {
+    $stripeDataId = null;
+    if ($stmt = $this->conn->prepare("
+      INSERT INTO stripe_data (payment_intent_id)
+      VALUES (?);
+    ")) {
+      $stmt->bind_param("s", $paymentIntentId);
+      $stmt->execute();
+      $stripeDataId = $stmt->insert_id;
+      $stmt->close();
+    }
+    return $stripeDataId;
+  }
+
+  public function saveCouponId($paymentIntentId, $couponId) {
+    $updateErrors = [];
+    if ($stmt = $this->conn->prepare("
+      UPDATE stripe_data
+      SET coupon_id = ?
+      WHERE payment_intent_id = ?;
+    ")) {
+      $stmt->bind_param("ss", $couponId, $paymentIntentId);
+      $stmt->execute();
+      $updateErrors = $stmt->error_list;
+    }
+    return $updateErrors;
   }
 
   public function retrieveDailySendJobs() {
@@ -61,8 +89,17 @@ class PersistenceStore
     return retrievePersonsByCoupleId($this->conn, $coupleId);
   }
 
-  public function retrieveProductOrderByPaymentIntentId($paymentIntentId) {
-    return retrieveProductOrderByPaymentIntentId($this->conn, $paymentIntentId);
+  public function relateProductOrderToStripeData($paymentIntentId, $productOrderId) {
+    $productOrderToStripeDataId = null;
+    if ($stmt = $this->conn->prepare("
+      INSERT INTO product_order_to_stripe_data (product_order_id, stripe_data_payment_intent_id)
+      VALUES (?, ?);
+    ")) {
+      $stmt->bind_param("is", $productOrderId, $paymentIntentId);
+      $stmt->execute();
+      $productOrderToStripeDataId = $stmt->insert_id;
+      $stmt->close();
+    }
+    return $productOrderToStripeDataId;
   }
 }
-
