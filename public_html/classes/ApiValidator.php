@@ -15,31 +15,6 @@ abstract class ApiValidator {
 
     $this->v = new Validator($this->assocArray);
 
-    $this->v->addInstanceRule('stripeResultNotAlreadyStored', function ($field, $value, $params, $fields) {
-      $db = null;
-      $json = json_decode($value);
-      if (json_last_error() !== JSON_ERROR_NONE) {
-        return false;
-      }
-      $db = new PersistenceStore();
-      $dbResults = $db->retrieveProductOrderByPaymentIntentId($json->paymentIntent->id);
-      // is the stripe result payment ID already in DB?
-      if (count($dbResults) > 0) {
-        return false;
-      }
-      return true;
-    }, '{field} is invalid -- this payment is already associated with an order!');
-
-    $this->v->addInstanceRule('paymentIntentIdNotAlreadyStored', function ($field, $value, $params, $fields) {
-      $db = new PersistenceStore();
-      $dbResults = $db->retrieveProductOrderByPaymentIntentId($value);
-      // is the stripe result payment ID already in DB?
-      if (count($dbResults) > 0) {
-        return false;
-      }
-      return true;
-    }, '');
-
     $this->v->addInstanceRule('validPaymentIntentId', function ($field, $value, $params, $fields) {
       $shop = new Shop();
       $paymentIntent = $shop->retrievePaymentIntentById($value);
