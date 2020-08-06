@@ -14,7 +14,6 @@ class UpdatePaymentIntentValidator extends ApiValidator
         'payload.receipt_email'
       ],
       'validPaymentIntentId' => ['paymentIntentId'],
-      'paymentIntentIdNotAlreadyStored' => ['paymentIntentId'],
       'email' => ['payload.receipt_email']
     ]);
   }
