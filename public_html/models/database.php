@@ -29,10 +29,13 @@ function insertCouple($conn, $primaryPersonId, $secondaryPersonId) {
   return $coupleId;
 }
 
-function insertProductOrder($conn, $coupleId, $startDate, $stripePaymentResult) {
+function insertProductOrder($conn, $coupleId, $startDate, $active) {
   $productOrderId = null;
-  if ($stmt = $conn->prepare("INSERT INTO product_order (couple_id, start_date, stripe_result) VALUES (?, CAST(? AS DATETIME), CAST(? AS JSON));")) {
-    $stmt->bind_param("sss", $coupleId, $startDate, $stripePaymentResult);
+  if ($stmt = $conn->prepare("
+    INSERT INTO product_order (couple_id, start_date, active)
+    VALUES (?, CAST(? AS DATETIME), ?);
+  ")) {
+    $stmt->bind_param("ssi", $coupleId, $startDate, $active);
     $stmt->execute();
     $productOrderId = $stmt->insert_id;
     $stmt->close();
@@ -144,18 +147,4 @@ function retrievePersonsByCoupleId($conn, $coupleId) {
     $persons = $result->fetch_all(MYSQLI_ASSOC);
   }
   return $persons;
-}
-
-function retrieveProductOrderByPaymentIntentId($conn, $paymentIntentId) {
-  $productOrders = [];
-  if ($stmt = $conn->prepare("
-    SELECT * FROM product_order
-    WHERE JSON_EXTRACT(stripe_result, '$.paymentIntent.id') = ?
-  ")) {
-    $stmt->bind_param("s", $paymentIntentId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $productOrders = $result->fetch_all(MYSQLI_ASSOC);
-  }
-  return $productOrders;
 }
