@@ -7,8 +7,7 @@ require '../classes/Shop.php';
 require '../classes/PersistenceStore.php';
 require '../classes/CouponCodeValidator.php';
 require '../classes/CreatePaymentIntentValidator.php';
-require '../classes/SaveProductWithCouponValidator.php';
-require '../classes/SaveProductWithoutCouponValidator.php';
+require '../classes/SaveProductValidator.php';
 require '../classes/UpdatePaymentIntentValidator.php';
 
 class Api
@@ -22,39 +21,41 @@ class Api
 
   public function saveProduct() {
     $body = $this->apiRequest->body;
-    $hasCoupon = $body->coupon_code !== null && $body->coupon_code != '';
+    $hasCoupon = property_exists($body, 'coupon_code') && $body->coupon_code !== null && $body->coupon_code != '';
+    $active = 0;
 
+    $v = new SaveProductValidator($body, $hasCoupon);
+    if (!$v->validate()) {
+      return new ApiResponse([
+        'errors' => $v->errors()
+      ], 400);
+    }
+
+    // Determine if product order is active
+    $s = new Shop();
+    $db = new PersistenceStore();
+    $pmtInt = $s->retrievePaymentIntentById($body->payment_intent);
     if ($hasCoupon) {
-      $v = new SaveProductWithCouponValidator($body);
-
-      if (!$v->validate()) {
-        return new ApiResponse([
-          'errors' => $v->errors()
-        ], 400);
-      }
-
       // Check if coupon makes price 100% off
-      $s = new Shop();
       $pr = $s->retrievePriceById($body->price);
       $c = $s->retrieveCouponByCouponId($body->coupon_code);
-      $priceAfterCoupon = $pr->unit_amount - ($pr->unit_amount * ($c->percent_off / 100));
+
       // HACK: Assume coupons are only percentage off
-      if ($priceAfterCoupon !== 0.0 && $body->stripe_result === null) {
+      $priceAfterCoupon = $pr->unit_amount - ($pr->unit_amount * ($c->percent_off / 100));
+      if ($priceAfterCoupon !== 0 && $pmtInt->status !== 'succeeded') {
         return new ApiResponse([
           'errors' => ['proof_of_purchase' => 'Payment is required']
         ]);
+      } else {
+        $db->saveCouponId($pmtInt->id, $c->id);
+        $active = 1;
       }
     } else {
-      $v = new SaveProductWithoutCouponValidator($body);
-
-      if (!$v->validate()) {
-        return new ApiResponse([
-          'errors' => $v->errors()
-        ], 400);
+      if ($pmtInt->status === 'succeeded') {
+        $active = 1;
       }
     }
 
-    $db = new PersistenceStore();
     $validPrimaryFirstName = $body->primary_firstname;
     $validPrimaryLastName = $body->primary_lastname;
     $validPrimaryPhoneNumber = $body->primary_phonenumber;
@@ -64,7 +65,6 @@ class Api
     $validSecondaryPhoneNumber = $body->secondary_phonenumber;
 
     $validStartDate = date_format(date_create($body->start_date), 'Y-m-d H:i:s');
-    $validStripeResult = $body->stripe_result;
 
     // TODO: Handle errors if insert failed
     $primaryPersonId = $db->savePerson(
@@ -78,7 +78,8 @@ class Api
       $validSecondaryPhoneNumber
     );
     $coupleId = $db->saveCouple($primaryPersonId, $secondaryPersonId);
-    $productOrderId = $db->saveProductOrder($coupleId, $validStartDate, $validStripeResult);
+    $productOrderId = $db->saveProductOrder($coupleId, $validStartDate, $active);
+    $db->relateProductOrderToStripeData($pmtInt->id, $productOrderId);
 
     return new ApiResponse([
       'productOrderId' => $productOrderId
