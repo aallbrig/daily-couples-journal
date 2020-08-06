@@ -198,11 +198,7 @@ form.addEventListener('submit', async (e) => {
         await updatePaymentIntent(paymentIntentId, document.getElementById('email').value);
         const formData = new FormData(e.target);
         formData.append('client_secret', ClientSecret);
-
-        if (recalculateCartTotal() !== 0) {
-            const stripePayment = await pay(stripe, Card, ClientSecret);
-            formData.append('stripe_result', JSON.stringify(stripePayment));
-        }
+        formData.append('payment_intent', paymentIntentId);
 
         const saveProductOrderRes = await fetch('/api/save-product.php', {
             method: 'POST',
