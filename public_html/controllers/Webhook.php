@@ -2,6 +2,7 @@
 require_once '../vendor/autoload.php';
 require '../classes/ApiRequest.php';
 require '../classes/ApiResponse.php';
+require '../classes/PersistenceStore.php';
 
 class Webhook
 {
@@ -22,6 +23,11 @@ class Webhook
 
     switch ($event->type) {
       case 'payment_intent.created':
+        $db = new PersistenceStore();
+        foreach ($event->data->values() as $pmtInt) {
+          $db->savePaymentIntentId($pmtInt->id);
+        }
+        break;
       case 'charge.failed':
       case 'charge.succeded':
       case 'payment_intent.failed':
