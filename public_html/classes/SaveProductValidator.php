@@ -1,14 +1,14 @@
 <?php
 include_once 'ApiValidator.php';
 
-class SaveProductWithoutCouponValidator extends ApiValidator
+
+class SaveProductValidator extends ApiValidator
 {
-  public function __construct($dataToValidate)
+  public function __construct($dataToValidate, $includeCoupon = false)
   {
     parent::__construct($dataToValidate);
 
     $phoneNumberRegex = '/^([0-9]( |-)?)?(\(?[0-9]{3}\)?|[0-9]{3})( |-)?([0-9]{3}( |-)?[0-9]{4}|[a-zA-Z0-9]{7})$/';
-
     $emailInput = 'email';
     $dateInput = 'start_date';
     $primaryFirstNameInput = 'primary_firstname';
@@ -17,10 +17,11 @@ class SaveProductWithoutCouponValidator extends ApiValidator
     $secondaryFirstNameInput = 'secondary_firstname';
     $secondaryLastNameInput = 'secondary_lastname';
     $secondaryPhoneNumberInput = 'secondary_phonenumber';
-    $stripeInput = 'stripe_result';
+    $paymentIntent = 'payment_intent';
+    $couponCode = 'coupon_code';
     $price = 'price';
 
-    $this->v->rules([
+    $rules = [
       'required' => [
         $primaryFirstNameInput,
         $primaryLastNameInput,
@@ -29,10 +30,12 @@ class SaveProductWithoutCouponValidator extends ApiValidator
         $secondaryLastNameInput,
         $secondaryPhoneNumberInput,
         $emailInput,
+        $dateInput,
         $price,
-        $stripeInput
+        $paymentIntent
       ],
       'validPriceId' => [$price],
+      'validPaymentIntentId' => [$paymentIntent],
       'email' => [$emailInput],
       'regex' => [
         [[$primaryPhoneNumberInput, $secondaryPhoneNumberInput], $phoneNumberRegex],
@@ -59,6 +62,14 @@ class SaveProductWithoutCouponValidator extends ApiValidator
       'dateBefore' => [
         [$dateInput, date('Y-m-d', strtotime(date("Y-m-d", mktime()) . " + 365 day"))]
       ]
-    ]);
+    ];
+
+    if ($includeCoupon) {
+      $rules = array_merge($rules, [
+        'validCouponCodeId' => [$couponCode],
+      ]);
+    }
+
+    $this->v->rules($rules);
   }
 }
